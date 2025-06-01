@@ -1,0 +1,62 @@
+{# templates/views_template.jinja #}
+"""
+Contains the assets for views related to {{ category }} in the warehouse.
+"""
+
+# Pipelines
+from warehouse.assets.constants import (
+    WarehouseCategories as Categories,
+    Groups,
+)
+import warehouse.sql.views.{{ folder_name }} as sql_views
+from warehouse.assets.utils import get_module_path, execute_sql_view_creation
+
+# Dagster
+from dagster import (
+    AssetExecutionContext,
+    asset,
+)
+{# Map folder names to categories and groups #}
+{% set config = {
+    'health_pollution': {
+        'category': 'HEALTH_POLLUTION',
+        'group': 'HEALTH'
+    },
+    'pollution': {
+        'category': 'POLLUTION',
+        'group': 'POLLUTION'
+    },
+    'social_media': {
+        'category': 'SOCIAL_MEDIA',
+        'group': 'SOCIAL_MEDIA'
+    }
+} -%}
+
+{% set cfg = config[folder_name] -%}
+
+{# Generate view constants #}
+{% for view in sql_views -%}
+{{ view.name|upper }}_VIEW = get_module_path(sql_views) / "{{ view.name }}.sql"
+{% endfor -%}
+
+{# Generate asset functions #}
+{% for view in sql_views -%}
+@asset(
+    group_name=Groups.{{ cfg.group }},
+    required_resource_keys={"postgres_alchemy"},
+    metadata={
+        "categories": [
+            Categories.{{ cfg.category }},
+            Categories.DATABASE,
+            Categories.VIEW,
+        ],
+        "sql_file": str({{ view.name|upper }}_VIEW),
+    },
+)
+def view_{{ view.name }}(context: AssetExecutionContext):
+    """
+    Executes the SQL query from the given file.
+    """
+    execute_sql_view_creation(context, {{ view.name|upper }}_VIEW)
+
+{% endfor -%}

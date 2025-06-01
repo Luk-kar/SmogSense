@@ -1,0 +1,6 @@
+[MASTER]
+# Default settings; no specific customizations
+
+[MESSAGES CONTROL]
+# Uncomment the following line to disable all the Pylint checks
+disable=no-else-raise, too-few-public-methods, redefined-outer-name, no-else-return, wrong-import-order

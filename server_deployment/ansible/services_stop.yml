@@ -1,0 +1,29 @@
+---
+- name: Stop SmogSense services and check running containers
+  hosts: ubuntu
+  become: true
+  vars:
+    smogsense_dir: "/home/{{ ansible_user }}/smogsense-server/SmogSense"
+
+  tasks:
+    - name: Stop SmogSense containers
+      become: false
+      community.docker.docker_compose_v2:
+        project_src: "{{ smogsense_dir }}"
+        state: stopped
+
+    - name: Check for running Docker containers
+      become: false
+      shell: docker ps --format '{{ "{{.Names}}" }}'
+      register: running_containers
+
+    - name: Display running Docker containers (if any)
+      become: false
+      ansible.builtin.debug:
+        msg: |
+          {% if running_containers.stdout %}
+          The following Docker containers are still running:
+          {{ running_containers.stdout_lines | join(', ') }}
+          {% else %}
+          No Docker containers are currently running.
+          {% endif %}

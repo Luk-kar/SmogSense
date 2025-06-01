@@ -1,0 +1,31 @@
+- name: Create application directory
+  file:
+    path: "{{ repository_dir}}"
+    state: directory
+    mode: "0755"
+
+- name: Check if SmogSense repo directory exists
+  stat:
+    path: "{{ smogsense_dir }}"
+  register: smogsense_repo_dir
+
+- name: Check if .git directory exists inside SmogSense repo
+  stat:
+    path: "{{ smogsense_dir }}/.git"
+  register: smogsense_git_dir
+
+- name: Clone repository
+  git:
+    repo: "{{ smogsense_repo }}"
+    dest: "{{ smogsense_dir }}"
+    update: yes
+  when: not smogsense_repo_dir.stat.exists
+
+- name: Make test scripts executable
+  file:
+    path: "{{ smogsense_dir }}/tests/{{ item }}"
+    mode: "0755"
+  loop:
+    - run_tests_all.sh
+    - run_tests_data_air_quality.sh
+    - run_tests_data_health.sh

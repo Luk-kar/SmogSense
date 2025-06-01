@@ -1,0 +1,28 @@
+apiVersion: 1
+
+providers:
+  - name: "Prometheus"
+    orgId: 1
+    folder: "Monitoring"
+    type: file
+    disableDeletion: false
+    editable: true
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+# NOTE:
+# Dashboard display order in Grafana folders is determined by dashboard title, sorted alphabetically.
+# To enforce a custom order, this project uses invisible Unicode characters (such as zero-width spaces) as prefixes in the "title" field of each dashboard's JSON.
+#
+# Example:
+#   "\u200Bdocker-logs"           # U+200B Zero Width Space (appears first)
+#   "\u200Cmonitor_services"      # U+200C Zero Width Non-Joiner
+#   "\u200Ddocker_containers"     # U+200D Zero Width Joiner
+#   "\u2060docker_host"           # U+2060 Word Joiner (appears last)
+#
+# WARNING:
+# - This is a workaround; invisible characters may be stripped or mishandled by some tools or editors.
+# - Searching for dashboards by title may be confusing, as the invisible prefix is not visible.
+# - Document any changes to dashboard titles carefully to avoid confusion.
+#
+# If you wish to change the display order, adjust the invisible Unicode character at the start of each dashboard title accordingly.

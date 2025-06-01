@@ -1,0 +1,15 @@
+# The requirements are common for all services to make development and the integration between them easier
+# If there will be any conflicts between the libraries, the service-specific requirements can be used.
+
+dagster==1.8.9           # Core Dagster framework for orchestrating data pipelines and workflows
+dagster-docker==0.24.9   # Dagster integration for running pipelines in Docker containers
+dagster-postgres==0.24.9 # Dagster support for using PostgreSQL as a storage backend
+boto3==1.35.43           # AWS SDK for Python, used for MiniIO integration
+pandas==2.2.2            # Data manipulation library, used for data processing
+pyarrow==17.0.0          # Apache Arrow integration for Pandas, used for data processing
+psycopg==3.2.1           # PostgreSQL adapter for Python, used for database connections
+PyYAML==6.0.2            # YAML parser and emitter for Python, used for configuration
+SQLAlchemy==2.0.36       # SQL toolkit and Object-Relational Mapping (ORM) library, used for database connections
+GeoAlchemy2==0.16.0      # Spatial extensions for SQLAlchemy, used for database connections
+shapely==2.0.6           # Python package for manipulation and analysis of planar geometric objects
+psycopg2-binary==2.9.9   # PostgreSQL adapter for Python, used for database connections

@@ -1,0 +1,145 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# PyInstaller
+*.spec
+
+# Docker artifacts
+*.tar
+*.log
+*.pid
+*.bak
+*.tmp
+
+# Ignore Docker-specific files and directories
+docker-compose.override.yml
+docker-compose.local.yml
+docker-compose.*.backup
+Dockerfile.backup
+
+# Ignore Docker build cache and other temporary artifacts
+**/src/**/Dockerfile~
+**/src/**/Dockerfile.bak
+docker-volumes/
+docker-cache/
+docker-networks/
+
+# Ignore Docker container and image data if stored locally
+**/src/**/tmp/
+**/src/**/data/
+**/src/**/cache/
+**/src/**/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables and secrets
+.env
+# .env.local, .env.production, etc.
+.env.*
+**/secrets/
+**/credentials/
+**/*.pem
+**/*.pem
+**/*.key
+**/*.crt
+**/*.pfx
+**/*.jks
+src/data_acquisition/social_media/config.ini
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Ignore data files
+data/
+logs/
+
+# Exclude binaries and compiled code
+*.exe
+*.dll
+*.o
+*.a
+*.out
+.ipynb_checkpoints
+
+# Exclude node_modules if using Node.js
+node_modules/
+
+# Exclude coverage reports
+htmlcov/
+.coverage
+
+# Exclude IDE and editor files
+.vscode/
+
+# Database-related temporary files (specific to services like Postgres, MinIO, etc.)
+**/src/storage/databases/postgres/data/
+**/src/storage/datalakes/minio/data/
+.src
+
+# Ignore Metabase configs and temporary files
+**/src/visualization/metabase/metabase.db/
+**/src/visualization/metabase/metabase_config/
+**/src/visualization/metabase/logs/
+
+# Ignore files created by specific tools used in orchestration (Dagster, dbt, etc.)
+**/src/orchestration/dagster/tmp/
+**/src/orchestration/dagster/logs/
+
+**/src/analytics/dbt/dbt_modules/
+**/src/analytics/dbt/target/
+**/src/analytics/dbt/logs/
+
+# Ignore temp files created by API services
+categories.json
+targeted_metrics.json
+air_pollution_death_data.json
+
+# Ignore temp files created in development
+tree.txt
+src/data_acquisition/social_media/Pipfile
+src/data_acquisition/social_media/Pipfile.lock
+src/data_acquisition/social_media/tweets.json
+src/data_acquisition/social_media/tweets copy.json
+src/data_acquisition/social_media/data
+
+# Authenticated user files
+x_auth.json
+cookies.json
+
+# Jinja output
+output/
+
+# WHITE LISTING
+
+#environmentals
+!.env.example
+!config.ini.example
+
+# JupyterLab
+!src/data_science/jupyterlab/data/
+!src/data_science/jupyterlab/data/user_code/
+!src/data_science/jupyterlab/data/Exploratory_Data_Analysis.ipynb
+
+# Read files output
+output.md
+
+# Terraform
+server_deployment/terraform/*.tfstate*
+server_deployment/terraform/.terraform/
+server_deployment/terraform/terraform.tfvars
+server_deployment/terraform/*.pem
+server_deployment/terraform/*.key

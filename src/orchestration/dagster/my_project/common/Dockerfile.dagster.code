@@ -1,0 +1,108 @@
+FROM python:3.10-slim
+
+# Build args to pass in at build time
+ARG PIPELINE_NAME
+ARG PIPELINE_MODULE
+ARG PIPELINE_REQUIREMENTS
+ARG PIPELINE_PORT
+ARG INSTALL_PGDUMP
+ARG MLFLOW_TRACKING_URI
+
+# Add build args for all resource-related env vars
+ARG MINIO_ENDPOINT_URL
+ARG MINIO_ACCESS_KEY_ID
+ARG MINIO_SECRET_ACCESS_KEY
+ARG POSTGRES_HOST
+ARG POSTGRES_HOST_PORT
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
+ARG POSTGRES_WAREHOUSE_DB
+
+ARG GITHUB_DATA_REPO
+ARG GITHUB_MINIO_SERVICE_PATH
+ARG GITHUB_MINIO_FILE_NAME
+ARG GITHUB_POSTGRES_SERVICE_PATH
+ARG GITHUB_POSTGRES_FILE_NAME
+
+# Display build args
+RUN echo "=== Build Args ==="
+RUN echo "PIPELINE_NAME: $PIPELINE_NAME"
+RUN echo "PIPELINE_MODULE: $PIPELINE_MODULE"
+RUN echo "PIPELINE_REQUIREMENTS: $PIPELINE_REQUIREMENTS"
+RUN echo "PIPELINE_PORT: $PIPELINE_PORT"
+RUN echo "MLFLOW_TRACKING_URI: $MLFLOW_TRACKING_URI"
+RUN echo "=================="
+
+# Any arg empty, exit
+RUN if [ -z "$PIPELINE_NAME" ] || [ -z "$PIPELINE_MODULE" ] || [ -z "$PIPELINE_REQUIREMENTS" ] || [ -z "$PIPELINE_PORT" ]; then \
+    echo "Error: One or more required build arguments are missing"; \
+    exit 1; \
+    fi
+
+# Make some actual build args available at runtime:
+ENV PIPELINE_MODULE=$PIPELINE_MODULE
+ENV PIPELINE_PORT=$PIPELINE_PORT
+ENV MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI
+
+# Set as environment variables for resources
+ENV MINIO_ENDPOINT_URL=${MINIO_ENDPOINT_URL}
+ENV MINIO_ACCESS_KEY_ID=${MINIO_ACCESS_KEY_ID}
+ENV MINIO_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
+ENV POSTGRES_HOST=${POSTGRES_HOST}
+ENV POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT}
+ENV POSTGRES_USER=${POSTGRES_USER}
+ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+ENV POSTGRES_WAREHOUSE_DB=${POSTGRES_WAREHOUSE_DB}
+
+ENV GITHUB_DATA_REPO=${GITHUB_DATA_REPO}
+ENV GITHUB_MINIO_SERVICE_PATH=${GITHUB_MINIO_SERVICE_PATH}
+ENV GITHUB_MINIO_FILE_NAME=${GITHUB_MINIO_FILE_NAME}
+ENV GITHUB_POSTGRES_SERVICE_PATH=${GITHUB_POSTGRES_SERVICE_PATH}
+ENV GITHUB_POSTGRES_FILE_NAME=${GITHUB_POSTGRES_FILE_NAME}
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y libpq-dev gcc netcat-openbsd
+
+# Conditionally install if `INSTALL_PGDUMP` is set to "true"
+# Needed for the postgres backup
+ARG INSTALL_PGDUMP
+RUN if [ "$INSTALL_PGDUMP" = "true" ]; then \
+    echo "Installing pg_dump for PostgreSQL backup..."; \
+    apt-get install -y postgresql-client; \
+    fi
+
+# Set DAGSTER_HOME
+ENV DAGSTER_HOME=/opt/dagster/dagster_home
+
+# Create the directory
+RUN mkdir -p $DAGSTER_HOME
+
+# Copy requirements
+COPY ./src/orchestration/dagster/my_project/requirements.user_code.txt $DAGSTER_HOME/requirements.user_code.txt
+COPY ${PIPELINE_REQUIREMENTS} $DAGSTER_HOME/requirements.pipeline.txt
+
+# Install python dependencies
+RUN pip install -r $DAGSTER_HOME/requirements.user_code.txt \
+    && pip install -r $DAGSTER_HOME/requirements.pipeline.txt
+
+# Copy pipeline-specific user code
+COPY ./src/orchestration/dagster/my_project/${PIPELINE_NAME} $DAGSTER_HOME/my_project/${PIPELINE_NAME}
+
+# Copy shared code
+COPY ./src/orchestration/dagster/my_project/common $DAGSTER_HOME/my_project/common
+
+# Copy the data_acquisition code
+COPY ./src/data_acquisition $DAGSTER_HOME/src/data_acquisition
+
+# Set the working directory
+WORKDIR $DAGSTER_HOME
+
+# Expose the port
+EXPOSE ${PIPELINE_PORT}
+
+# Start Dagster gRPC server on the given port with the given module
+# (Docker’s shell form allows environment variable expansion)
+CMD dagster api grpc -h 0.0.0.0 -p $PIPELINE_PORT -m my_project.$PIPELINE_MODULE

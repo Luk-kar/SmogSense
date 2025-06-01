@@ -1,0 +1,35 @@
+# ============================================================
+# Monitoring Network Exclusive Configuration
+# ============================================================
+
+:{$PUBLIC_GRAFANA_PORT} {
+    reverse_proxy grafana:{$GRAFANA_PORT}
+}
+
+:{$PUBLIC_CADVISOR_PORT} {
+    basicauth /* {
+        {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
+    }
+    reverse_proxy cadvisor:{$CADVISOR_PORT}
+}
+
+:{$PUBLIC_PROMETHEUS_PORT} {
+    basicauth /* {
+        {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
+    }
+    reverse_proxy prometheus:{$PROMETHEUS_PORT}
+}
+
+:{$PUBLIC_LOKI_PORT} {
+    basicauth /* {
+        {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
+    }
+    reverse_proxy loki:{$LOKI_PORT}
+}
+
+:{$PUBLIC_PROMTAIL_PORT} {
+    basicauth /* {
+        {$GRAFANA_ADMIN_USERNAME} {$CADDY_ADMIN_PASSWORD_HASH}
+    }
+    reverse_proxy promtail:{$PROMTAIL_PORT}
+}

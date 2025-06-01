@@ -1,0 +1,5 @@
+[X]
+username = YOUR_USERNAME ; Twitter username
+password = YOUR_PASSWORD ; Twitter password
+email = YOUR_EMAIL@email.com ; Twitter email
+user_language= YOUR_LANGUAGE ; Twitter language like pl-PL

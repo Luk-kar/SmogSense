@@ -1,0 +1,7 @@
+# [dev]
+
+# data_acquisition
+
+# [health]
+Requests==2.32.3
+

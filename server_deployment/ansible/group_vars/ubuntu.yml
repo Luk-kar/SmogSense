@@ -1,0 +1,3 @@
+smogsense_repo: "https://github.com/Luk-kar/SmogSense"
+repository_dir: "/home/{{ ansible_user }}/smogsense-server"
+smogsense_dir: "{{ repository_dir }}/SmogSense"

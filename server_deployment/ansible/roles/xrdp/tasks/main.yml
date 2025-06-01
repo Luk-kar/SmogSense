@@ -1,0 +1,33 @@
+- name: Install xfce4 desktop environment
+  apt:
+    name: xfce4
+    state: present
+
+- name: Install xfce4-session
+  apt:
+    name: xfce4-session
+    state: present
+
+- name: Install xrdp
+  apt:
+    name: xrdp
+    state: present
+
+- name: Enable xrdp service
+  service:
+    name: xrdp
+    enabled: yes
+    state: started
+
+- name: Configure xrdp session
+  ansible.builtin.lineinfile:
+    path: "/home/{{ ansible_user }}/.xsession"
+    line: xfce4-session
+    create: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Restart xrdp service
+  service:
+    name: xrdp
+    state: restarted

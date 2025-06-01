@@ -1,0 +1,26 @@
+---
+- name: Base system setup
+  hosts: ubuntu
+  become: true
+  roles:
+    - common
+    - docker
+    - xrdp
+
+- name: Application setup
+  hosts: ubuntu
+  become: true
+  roles:
+    - app
+
+- name: Configuration setup
+  hosts: ubuntu
+  become: true
+  roles:
+    - config
+
+- name: Service deployment
+  hosts: ubuntu
+  become: true
+  roles:
+    - deploy

@@ -1,0 +1,6 @@
+[MESSAGES CONTROL]
+disable =
+    E0401,  # Unable to import module
+    C0103,  # Invalid name
+    R1720,  # Unnecessary "else" after "return"
+    # Add other error codes you want to disable

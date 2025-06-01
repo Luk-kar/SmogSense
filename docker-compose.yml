@@ -1,0 +1,971 @@
+# ==============================================================================
+# Description: This file contains the configuration
+# for the services that will be deployed in the local environment.
+# Docker version 27.3.1, build ce12230
+# ==============================================================================
+services:
+  # ==============================================================================
+  # Postgres: Provides a relational database for services' apps data and data warehousing.
+  # ==============================================================================
+  postgres:
+    build: ./src/storage/databases/postgres/setup
+    labels:
+      - "type=storage,databases,structured_data,warehouse,data_mart"
+    container_name: smogsense_postgres
+    hostname: postgres
+    ports:
+      - "${POSTGRES_HOST_PORT}:${POSTGRES_CONTAINER_PORT}"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - intranet
+    # volumes:
+    # Uncomment for persistence:
+    # - ./src/storage/databases/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==============================================================================
+  # pgAdmin: Web-based administration tool for managing the Postgres database.
+  # ==============================================================================
+  pgadmin:
+    build:
+      context: ./src/analytics/pgadmin
+      dockerfile: Dockerfile.pgadmin
+      args:
+        POSTGRES_HOST: ${POSTGRES_HOST}
+        POSTGRES_PORT: ${POSTGRES_HOST_PORT}
+        POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        MLFLOW_DB_NAME: ${MLFLOW_DB_NAME}
+        MLFLOW_DB_USERNAME: ${MLFLOW_DB_USERNAME}
+        DAGSTER_PG_DB: ${DAGSTER_PG_DB}
+        DAGSTER_POSTGRES_USER: ${POSTGRES_USER}
+        MM_DBNAME: ${MM_DBNAME}
+        MM_USERNAME: ${MM_USERNAME}
+    labels:
+      - "type=analytics,database_management"
+    container_name: smogsense_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - ${PGADMIN_HOST_PORT}:${PGADMIN_CONTAINER_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - intranet
+
+  # ==============================================================================
+  # MinIO: Provides S3-compatible object storage for unstructured data.
+  # Used mostly as staging area.
+  # ==============================================================================
+  minio:
+    image: minio/minio:RELEASE.2024-09-22T00-33-43Z
+    container_name: smogsense_minio
+    labels:
+      - "type=storage,datalakes,object_storage,s3_compatible,unstructured_data"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./src/storage/datalakes/minio/data:/data
+
+    ports:
+      - ${MINIO_HOST_PORT_API}:${MINIO_CONTAINER_PORT_API} # MinIO API port (S3-compatible API)
+      - ${MINIO_HOST_PORT_WEB}:${MINIO_CONTAINER_PORT_WEB} # MinIO Console port (web interface)
+    command: server /data --console-address ":${MINIO_CONTAINER_PORT_WEB}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail http://localhost:${MINIO_CONTAINER_PORT_API}/minio/health/live || exit 1",
+        ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - intranet
+
+  # ==============================================================================
+  # MLflow: Tracks and manages model versions.
+  # ==============================================================================
+  mlflow:
+    build: ./src/storage/models/mlflow
+    container_name: smogsense_mlflow
+    labels:
+      - "type=storage,models,model_registry,model_versioning,mlops"
+    ports:
+      - ${MLFLOW_HOST_PORT}:${MLFLOW_CONTAINER_PORT}
+    volumes:
+      - ./src/storage/models/mlflow/data:/mlflow
+    environment:
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
+      MLFLOW_ARTIFACT_ROOT: ${MLFLOW_ARTIFACT_ROOT}
+      MLFLOW_DB_USERNAME: ${MLFLOW_DB_USERNAME}
+      MLFLOW_DB_PASSWORD: ${MLFLOW_DB_PASSWORD}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail http://localhost:${MLFLOW_CONTAINER_PORT}/ || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - intranet
+
+  # ==============================================================================
+  # Superset: Provides data visualization and dashboarding for analytics.
+  # ==============================================================================
+  superset:
+    image: apache/superset:4.0.2
+    container_name: smogsense_superset
+    labels:
+      - "type=analytics,data_visualization,business_intelligence,frontend"
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_DB_USER: ${SUPERSET_DB_USER}
+      SUPERSET_DB_PASSWORD: ${SUPERSET_DB_PASSWORD}
+      SUPERSET_DB_HOST: ${SUPERSET_DB_HOST}
+      SUPERSET_DB_PORT: ${SUPERSET_DB_PORT}
+      SUPERSET_DB_NAME: ${SUPERSET_DB_NAME}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME}
+      SUPERSET_ADMIN_FIRST_NAME: ${SUPERSET_ADMIN_FIRST_NAME}
+      SUPERSET_ADMIN_LAST_NAME: ${SUPERSET_ADMIN_LAST_NAME}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_HOST_PORT: ${SUPERSET_HOST_PORT}
+      POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+      MAXBOX_API_KEY: ${MAXBOX_API_KEY} # For geospatial visualization
+
+      CACHE_CONFIG: >
+        {
+          "CACHE_TYPE": "redis",
+          "CACHE_DEFAULT_TIMEOUT": 300,
+          "CACHE_KEY_PREFIX": "superset_cache_",
+          "CACHE_REDIS_HOST": "redis",
+          "CACHE_REDIS_PORT": ${CACHE_REDIS_PORT},
+          "CACHE_REDIS_DB": 1,
+          "CACHE_REDIS_URL": "redis://redis:${CACHE_REDIS_PORT}/1"
+        }
+      SUPERSET_CELERY_BROKER_URL: redis://${CACHE_REDIS_HOST}:${CACHE_REDIS_PORT}/0
+      SUPERSET_CELERY_RESULT_BACKEND: redis://${CACHE_REDIS_HOST}:${CACHE_REDIS_PORT}/0
+    ports:
+      - ${SUPERSET_HOST_PORT}:${SUPERSET_CONTAINER_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./src/analytics/superset/entrypoint.sh:/entrypoint.sh
+      - ./src/analytics/superset/dashboards/:/tmp/superset/dashboards/
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    networks:
+      - intranet
+
+  # ==============================================================================
+  # Redis: Provides caching and message queuing for Superset's background tasks and data processing.
+  # ==============================================================================
+  redis:
+    image: redis:7.4.0
+    container_name: smogsense_redis
+    labels:
+      - "type=storage,analytics,cache,queue"
+    sysctls:
+      # ==============================================================
+      # Increase the maximum number of connections that can be opened
+      # ==============================================================
+      - net.core.somaxconn=1024
+
+    environment:
+      CACHE_REDIS_HOST: ${CACHE_REDIS_HOST}
+      CACHE_REDIS_PORT: ${CACHE_REDIS_PORT}
+      CACHE_REDIS_DB: ${CACHE_REDIS_DB}
+      CACHE_REDIS_URL: ${CACHE_REDIS_URL}
+    ports:
+      - ${CACHE_REDIS_PORT}:${CACHE_REDIS_PORT}
+    networks:
+      - intranet
+
+  # ==============================================================================
+  # JupyterLab: Provides an interactive environment for data exploration and analysis.
+  # ==============================================================================
+  jupyterlab:
+    build:
+      context: ./src/data_science/jupyterlab/
+      dockerfile: Dockerfile
+    container_name: smogsense_jupyterlab
+    labels:
+      - "type=data_science,model_building,development,advanced_analytics,advanced_visualization"
+    hostname: jupyterlab
+    ports:
+      - ${JUPYTER_HOST_PORT}:${JUPYTER_CONTAINER_PORT}
+    volumes:
+      - ./src/data_science/jupyterlab/data:/home/jovyan/work
+      # - ./src/orchestration/dagster/my_project/common/utils/model_deployment:/home/jovyan/work/user_code
+    environment:
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN}
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
+      GIT_PYTHON_REFRESH: ${JUPYTER_GIT_PYTHON_REFRESH}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_HOST_PORT}
+    networks:
+      - intranet
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      mlflow:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail http://localhost:${JUPYTER_CONTAINER_PORT} || exit 1",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # mattermost:
+  #   # ==============================================================================
+  #   # Mattermost: Facilitates team collaboration through chat, notifications, and task management features.
+  #   # ==============================================================================
+
+  #   # ==============================================================
+  #   # Before the build IF USING VOLUMES do the following like:
+  #   # sudo chown -R 2000:2000 ./mattermost/config
+  #   # sudo chmod +rw ./mattermost/config/config.json
+  #   # for any other files or folder that need to be accessed by the container
+  #   # sudo chown -R 2000:2000 ./mattermost/...
+  #   # ==============================================================
+
+  #   build:
+  #     context: ./src/collaboration_management/mattermost/
+  #     dockerfile: Dockerfile
+  #   container_name: smogsense_mattermost
+  #   labels:
+  #     - "type=collaboration_management,chat,team_communication,kanban"
+  #   ports:
+  #     - ${MM_HOST_PORT}:${MM_CONTAINER_PORT}
+  #   environment:
+  #     MM_USERNAME: ${MM_USERNAME}
+  #     MM_PASSWORD: ${MM_PASSWORD}
+  #     MM_DBNAME: ${MM_DBNAME}
+  #     MM_WEBHOOK_ID:${MM_WEBHOOK_ID}
+  #     MM_SQLSETTINGS_DRIVERNAME: ${MM_SQLSETTINGS_DRIVERNAME}
+  #     MM_SQLSETTINGS_ATRESTENCRYPTKEY: ${MM_SQLSETTINGS_ATRESTENCRYPTKEY}
+  #     SERVICESETTINGS_LISTENADDRESS: ${MM_SERVICESETTINGS_LISTENADDRESS}
+
+  #     MM_PLUGINSETTINGS_ENABLEUPLOADS: ${MM_PLUGINSETTINGS_ENABLEUPLOADS}
+  #     MM_PLUGINSETTINGS_ENABLE: ${MM_PLUGINSETTINGS_ENABLE}
+  #     MM_PLUGINSETTINGS_ENABLEPREPACKAGEDPLUGINS: ${MM_PLUGINSETTINGS_ENABLEPREPACKAGEDPLUGINS}
+  #     MM_FILESETTINGS_MAXFILESIZE: ${MM_FILESETTINGS_MAXFILESIZE}
+
+  #     MM_PLUGINSETTINGS_PLUGINSTATES: ${MM_PLUGINSETTINGS_PLUGINSTATES}
+  #     MM_ALERT_CHANNEL_NAME: ${MM_ALERT_CHANNEL_NAME}
+  #
+  #     # ==============================================================
+  #     # # Configures Mattermost to use a local mode socket for administrative tasks
+  #     # at /var/tmp/mattermost_local.socket and sets the site URL to http://localhost:8065.
+  #     # ==============================================================
+  #     MM_SERVICESETTINGS_SITEURL: ${MM_SERVICESETTINGS_SITEURL}
+  #     MM_SERVICESETTINGS_ENABLELOCALMODE: ${MM_SERVICESETTINGS_ENABLELOCALMODE}
+  #     MM_SERVICESETTINGS_LOCALMODESOCKETLOCATION: ${MM_SERVICESETTINGS_LOCALMODESOCKETLOCATION}
+
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - intranet
+
+  # ==============================================================
+  # Dagster services are containerized separately for modular development,
+  # allowing independent builds and updates without affecting all services.
+  # This ensures that critical processes, like data runs, remain intact
+  # during code or daemon (workflow management) updates.
+  # ==============================================================
+
+  # ==============================================================
+  # This service runs the gRPC server that loads your user code, in both dagster-webserver
+  # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
+  # run launcher to use this same image when launching runs in a new container as well.
+  # Multiple containers like this can be deployed separately - each just needs to run on
+  # its own port, and have its own entry in the workspace.yaml file that's loaded by the
+  # webserver.
+  # ==============================================================
+
+  # ==============================================================
+  # The code location for the air quality pipeline
+  # ==============================================================
+
+  dagster_code_air_quality:
+    container_name: smogsense_dagster_air_quality_code
+    labels:
+      - "type=orchestration,pipeline_execution,air_quality,user_code,grpc_server"
+    build:
+      context: .
+      dockerfile: ./src/orchestration/dagster/my_project/common/Dockerfile.dagster.code
+      args:
+        PIPELINE_NAME: ${AIR_QUALITY_PIPELINE_NAME}
+        PIPELINE_MODULE: ${AIR_QUALITY_PIPELINE_MODULE}
+        PIPELINE_REQUIREMENTS: ${AIR_QUALITY_PIPELINE_REQUIREMENTS}
+        PIPELINE_PORT: ${AIR_QUALITY_PIPELINE_PORT}
+        # Resource values
+        MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL}
+        MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+        MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+        POSTGRES_HOST: ${POSTGRES_HOST}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+        GITHUB_DATA_REPO: ${GITHUB_DATA_REPO}
+        GITHUB_MINIO_SERVICE_PATH: ${GITHUB_MINIO_SERVICE_PATH}
+        GITHUB_MINIO_FILE_NAME: ${GITHUB_MINIO_FILE_NAME}
+        GITHUB_POSTGRES_SERVICE_PATH: ${GITHUB_POSTGRES_SERVICE_PATH}
+        GITHUB_POSTGRES_FILE_NAME: ${GITHUB_POSTGRES_FILE_NAME}
+    image: dagster_air_quality_code_image
+    restart: ${RESTART_POLICY}
+    environment:
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      DAGSTER_CURRENT_IMAGE: dagster_air_quality_code_image
+      MINIO_HOST_PORT_WEB: ${MINIO_HOST_PORT_WEB}
+      DAGSTER_USER_CODE_CONTAINER_PORT: ${AIR_QUALITY_PIPELINE_PORT}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "${AIR_QUALITY_PIPELINE_PORT}"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    ports:
+      - "${AIR_QUALITY_PIPELINE_PORT}:${AIR_QUALITY_PIPELINE_PORT}"
+    networks:
+      - intranet
+
+  # ==============================================================
+  # The code location for the health pipeline
+  # ==============================================================
+
+  dagster_code_health:
+    container_name: smogsense_dagster_user_code_health
+    labels:
+      - "type=orchestration,pipeline_execution,health,user_code,grpc_server"
+    build:
+      context: .
+      dockerfile: ./src/orchestration/dagster/my_project/common/Dockerfile.dagster.code
+      args:
+        PIPELINE_NAME: ${HEALTH_PIPELINE_NAME}
+        PIPELINE_MODULE: ${HEALTH_PIPELINE_MODULE}
+        PIPELINE_REQUIREMENTS: ${HEALTH_PIPELINE_REQUIREMENTS}
+        PIPELINE_PORT: ${HEALTH_PIPELINE_PORT}
+        # Resource values
+        MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL}
+        MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+        MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+        POSTGRES_HOST: ${POSTGRES_HOST}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+        GITHUB_DATA_REPO: ${GITHUB_DATA_REPO}
+        GITHUB_MINIO_SERVICE_PATH: ${GITHUB_MINIO_SERVICE_PATH}
+        GITHUB_MINIO_FILE_NAME: ${GITHUB_MINIO_FILE_NAME}
+        GITHUB_POSTGRES_SERVICE_PATH: ${GITHUB_POSTGRES_SERVICE_PATH}
+        GITHUB_POSTGRES_FILE_NAME: ${GITHUB_POSTGRES_FILE_NAME}
+    image: dagster_user_code_health_image
+    restart: ${RESTART_POLICY}
+    environment:
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      DAGSTER_CURRENT_IMAGE: dagster_user_code_health_image
+      DAGSTER_USER_CODE_CONTAINER_PORT: ${HEALTH_PIPELINE_PORT}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "${HEALTH_PIPELINE_PORT}"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    ports:
+      - "${HEALTH_PIPELINE_PORT}:${HEALTH_PIPELINE_PORT}"
+    networks:
+      - intranet
+
+  # ==============================================================
+  # The code location for the social media pipeline
+  # ==============================================================
+
+  dagster_code_social_media:
+    container_name: smogsense_dagster_social_media_code
+    labels:
+      - "type=orchestration,pipeline_execution,twitter,social_media,semantic_analysis,user_code,grpc_server"
+    build:
+      context: .
+      dockerfile: ./src/orchestration/dagster/my_project/common/Dockerfile.dagster.code
+      args:
+        PIPELINE_NAME: ${SOCIAL_MEDIA_PIPELINE_NAME}
+        PIPELINE_MODULE: ${SOCIAL_MEDIA_PIPELINE_MODULE}
+        PIPELINE_REQUIREMENTS: ${SOCIAL_MEDIA_PIPELINE_REQUIREMENTS}
+        PIPELINE_PORT: ${SOCIAL_MEDIA_PIPELINE_PORT}
+        # Resource values
+        MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL}
+        MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+        MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+        POSTGRES_HOST: ${POSTGRES_HOST}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+        GITHUB_DATA_REPO: ${GITHUB_DATA_REPO}
+        GITHUB_MINIO_SERVICE_PATH: ${GITHUB_MINIO_SERVICE_PATH}
+        GITHUB_MINIO_FILE_NAME: ${GITHUB_MINIO_FILE_NAME}
+        GITHUB_POSTGRES_SERVICE_PATH: ${GITHUB_POSTGRES_SERVICE_PATH}
+        GITHUB_POSTGRES_FILE_NAME: ${GITHUB_POSTGRES_FILE_NAME}
+    image: dagster_social_media_code_image
+    restart: ${RESTART_POLICY}
+    environment:
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      DAGSTER_CURRENT_IMAGE: dagster_social_media_code_image
+      DAGSTER_USER_CODE_CONTAINER_PORT: ${SOCIAL_MEDIA_PIPELINE_PORT}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "${SOCIAL_MEDIA_PIPELINE_PORT}"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    ports:
+      - "${SOCIAL_MEDIA_PIPELINE_PORT}:${SOCIAL_MEDIA_PIPELINE_PORT}"
+    networks:
+      - intranet
+  # ==============================================================
+  # The code location for the territory pipeline
+  # ==============================================================
+  dagster_code_territory:
+    container_name: smogsense_dagster_territory_code
+    labels:
+      - "type=orchestration,pipeline_execution,territory,user_code,grpc_server"
+    build:
+      context: .
+      dockerfile: ./src/orchestration/dagster/my_project/common/Dockerfile.dagster.code
+      args:
+        PIPELINE_NAME: ${TERRITORY_PIPELINE_NAME}
+        PIPELINE_MODULE: ${TERRITORY_PIPELINE_MODULE}
+        PIPELINE_REQUIREMENTS: ${TERRITORY_PIPELINE_REQUIREMENTS}
+        PIPELINE_PORT: ${TERRITORY_PIPELINE_PORT}
+        # Resource values
+        MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL}
+        MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+        MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+        POSTGRES_HOST: ${POSTGRES_HOST}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+        GITHUB_DATA_REPO: ${GITHUB_DATA_REPO}
+        GITHUB_MINIO_SERVICE_PATH: ${GITHUB_MINIO_SERVICE_PATH}
+        GITHUB_MINIO_FILE_NAME: ${GITHUB_MINIO_FILE_NAME}
+        GITHUB_POSTGRES_SERVICE_PATH: ${GITHUB_POSTGRES_SERVICE_PATH}
+        GITHUB_POSTGRES_FILE_NAME: ${GITHUB_POSTGRES_FILE_NAME}
+    image: dagster_territory_code_image
+    restart: ${RESTART_POLICY}
+    environment:
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      DAGSTER_CURRENT_IMAGE: dagster_territory_code_image
+      DAGSTER_USER_CODE_CONTAINER_PORT: ${TERRITORY_PIPELINE_PORT}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "${TERRITORY_PIPELINE_PORT}"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    ports:
+      - "${TERRITORY_PIPELINE_PORT}:${TERRITORY_PIPELINE_PORT}"
+    networks:
+      - intranet
+
+  # ==============================================================
+  # The code location for the warehouse pipeline
+  # ==============================================================
+
+  dagster_code_warehouse:
+    container_name: smogsense_dagster_warehouse_code
+    labels:
+      - "type=orchestration,pipeline_execution,warehouse,user_code,grpc_server"
+    build:
+      context: .
+      dockerfile: ./src/orchestration/dagster/my_project/common/Dockerfile.dagster.code
+      args:
+        PIPELINE_NAME: ${WAREHOUSE_PIPELINE_NAME}
+        PIPELINE_MODULE: ${WAREHOUSE_PIPELINE_MODULE}
+        PIPELINE_REQUIREMENTS: ${WAREHOUSE_PIPELINE_REQUIREMENTS}
+        PIPELINE_PORT: ${WAREHOUSE_PIPELINE_PORT}
+        INSTALL_PGDUMP: "true" # Install pg_dump for database backup tasks
+        # Resource values
+        MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL}
+        MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+        MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+        POSTGRES_HOST: ${POSTGRES_HOST}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+        GITHUB_DATA_REPO: ${GITHUB_DATA_REPO}
+        GITHUB_MINIO_SERVICE_PATH: ${GITHUB_MINIO_SERVICE_PATH}
+        GITHUB_MINIO_FILE_NAME: ${GITHUB_MINIO_FILE_NAME}
+        GITHUB_POSTGRES_SERVICE_PATH: ${GITHUB_POSTGRES_SERVICE_PATH}
+        GITHUB_POSTGRES_FILE_NAME: ${GITHUB_POSTGRES_FILE_NAME}
+    image: dagster_warehouse_code_image
+    restart: ${RESTART_POLICY}
+    environment:
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      DAGSTER_CURRENT_IMAGE: dagster_warehouse_code_image
+      MINIO_HOST_PORT_WEB: ${MINIO_HOST_PORT_WEB}
+      DAGSTER_USER_CODE_CONTAINER_PORT: ${WAREHOUSE_PIPELINE_PORT}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "${WAREHOUSE_PIPELINE_PORT}"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    ports:
+      - "${WAREHOUSE_PIPELINE_PORT}:${WAREHOUSE_PIPELINE_PORT}"
+    networks:
+      - intranet
+
+  # ==============================================================
+  # The code location for the models deployment pipeline
+  # ==============================================================
+  dagster_code_models_deployment:
+    container_name: smogsense_dagster_models_code
+    labels:
+      - "type=orchestration,pipeline_execution,models,user_code,grpc_server"
+    build:
+      context: .
+      dockerfile: ./src/orchestration/dagster/my_project/common/Dockerfile.dagster.code
+      args:
+        PIPELINE_NAME: ${MODELS_PIPELINE_NAME}
+        PIPELINE_MODULE: ${MODELS_PIPELINE_MODULE}
+        PIPELINE_REQUIREMENTS: ${MODELS_PIPELINE_REQUIREMENTS}
+        PIPELINE_PORT: ${MODELS_PIPELINE_PORT}
+        MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
+        # Resource values
+        MINIO_ENDPOINT_URL: ${MINIO_ENDPOINT_URL}
+        MINIO_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+        MINIO_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+        POSTGRES_HOST: ${POSTGRES_HOST}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_WAREHOUSE_DB: ${POSTGRES_WAREHOUSE_DB}
+        GITHUB_DATA_REPO: ${GITHUB_DATA_REPO}
+        GITHUB_MINIO_SERVICE_PATH: ${GITHUB_MINIO_SERVICE_PATH}
+        GITHUB_MINIO_FILE_NAME: ${GITHUB_MINIO_FILE_NAME}
+        GITHUB_POSTGRES_SERVICE_PATH: ${GITHUB_POSTGRES_SERVICE_PATH}
+        GITHUB_POSTGRES_FILE_NAME: ${GITHUB_POSTGRES_FILE_NAME}
+    image: dagster_models_code_image
+    restart: ${RESTART_POLICY}
+    environment:
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      DAGSTER_CURRENT_IMAGE: dagster_models_code_image
+      DAGSTER_USER_CODE_CONTAINER_PORT: ${MODELS_PIPELINE_PORT}
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "${MODELS_PIPELINE_PORT}"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    ports:
+      - "${MODELS_PIPELINE_PORT}:${MODELS_PIPELINE_PORT}"
+    networks:
+      - intranet
+
+  # ==============================================================================
+  # dagster_webserver: Hosts the Dagster UI for orchestrating pipelines and jobs.
+  # ==============================================================================
+  dagster_webserver:
+    container_name: smogsense_dagster_webserver
+    labels:
+      - "type=orchestration,workflow_management,frontend"
+    build:
+      context: ./src/orchestration/dagster/
+      dockerfile: ./Dockerfile.dagster
+      args:
+        AIR_QUALITY_PIPELINE_PORT: ${AIR_QUALITY_PIPELINE_PORT}
+        HEALTH_PIPELINE_PORT: ${HEALTH_PIPELINE_PORT}
+        SOCIAL_MEDIA_PIPELINE_PORT: ${SOCIAL_MEDIA_PIPELINE_PORT}
+        WAREHOUSE_PIPELINE_PORT: ${WAREHOUSE_PIPELINE_PORT}
+        TERRITORY_PIPELINE_PORT: ${TERRITORY_PIPELINE_PORT}
+        MODELS_PIPELINE_PORT: ${MODELS_PIPELINE_PORT}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+    entrypoint:
+      - dagster-webserver
+      - -h
+      - "0.0.0.0"
+      - -p
+      - ${DAGSTER_WEBSERVER_CONTAINER_PORT}
+      - -w
+      - workspace.yaml # Specifies the workspace configuration file to load user code locations for the webserver
+    expose:
+      - ${DAGSTER_WEBSERVER_CONTAINER_PORT}
+    ports:
+      - ${DAGSTER_WEBSERVER_HOST_PORT}:${DAGSTER_WEBSERVER_CONTAINER_PORT}
+    environment:
+      DAGSTER_POSTGRES_USER: ${POSTGRES_USER}
+      DAGSTER_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+    volumes: # Make docker client accessible so we can terminate containers from the webserver
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    networks:
+      - intranet
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      dagster_code_air_quality:
+        condition: service_healthy
+      dagster_code_health:
+        condition: service_healthy
+      dagster_code_social_media:
+        condition: service_healthy
+      dagster_code_warehouse:
+        condition: service_healthy
+      dagster_code_territory:
+        condition: service_healthy
+
+  # ==============================================================================
+  # dagster_daemon: Pulls runs from the queue for execution and handles scheduling.
+  # ==============================================================================
+  dagster_daemon:
+    container_name: smogsense_dagster_daemon
+    labels:
+      - "type=orchestration,workflow_management,backend"
+    build:
+      context: ./src/orchestration/dagster/
+      dockerfile: ./Dockerfile.dagster
+      args:
+        AIR_QUALITY_PIPELINE_PORT: ${AIR_QUALITY_PIPELINE_PORT}
+        HEALTH_PIPELINE_PORT: ${HEALTH_PIPELINE_PORT}
+        SOCIAL_MEDIA_PIPELINE_PORT: ${SOCIAL_MEDIA_PIPELINE_PORT}
+        WAREHOUSE_PIPELINE_PORT: ${WAREHOUSE_PIPELINE_PORT}
+        TERRITORY_PIPELINE_PORT: ${TERRITORY_PIPELINE_PORT}
+        MODELS_PIPELINE_PORT: ${MODELS_PIPELINE_PORT}
+        POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+    entrypoint:
+      - dagster-daemon
+      - run
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      DAGSTER_POSTGRES_USER: ${POSTGRES_USER}
+      DAGSTER_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DAGSTER_POSTGRES_DB: ${DAGSTER_PG_DB}
+      POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage # Mounts a volume for persistent storage used by Dagster's IO manager to share data between jobs and assets.
+      - /tmp/dagster_storage:/opt/dagster/dagster_home/storage
+    networks:
+      - intranet
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      mlflow:
+        condition: service_healthy
+      dagster_code_air_quality:
+        condition: service_healthy
+      dagster_code_health:
+        condition: service_healthy
+      dagster_code_social_media:
+        condition: service_healthy
+      dagster_code_warehouse:
+        condition: service_healthy
+      dagster_code_territory:
+        condition: service_healthy
+      dagster_code_models_deployment:
+        condition: service_healthy
+
+  # ==============================================================
+  # Monitoring Stack
+  # ==============================================================
+  #
+  # Monitors host resourcess, services and docker logs
+  #
+  # --------------------------------------------------------------
+
+  # ==============================================================================
+  # prometheus: Collects and stores time-series metrics from monitored targets,
+  # enabling alerting and visualization.
+  # ==============================================================================
+  prometheus:
+    container_name: monitoring-prometheus
+    labels:
+      - "type=monitoring,metrics,alerting,time_series"
+    build:
+      context: ./src/monitoring/prometheus
+      dockerfile: Dockerfile
+      args:
+        - PROMETHEUS_MONITOR_LABEL=${PROMETHEUS_MONITOR_LABEL}
+        - NODE_EXPORTER_PORT=${NODE_EXPORTER_PORT}
+        - CADVISOR_PORT=${CADVISOR_PORT}
+        - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+        - PUSHGATEWAY_PORT=${PUSHGATEWAY_PORT}
+        - ALERTMANAGER_PORT=${ALERTMANAGER_PORT}
+        - NGINX_EXPORTER_PORT=${NGINX_EXPORTER_PORT}
+        - EVENT_LOG_PORT=${EVENT_LOG_PORT}
+        - PROMETHEUS_RETENTION_TIME=${PROMETHEUS_RETENTION_TIME}
+    expose:
+      - ${PROMETHEUS_PORT}
+    environment:
+      - PROMETHEUS_RETENTION_TIME=${PROMETHEUS_RETENTION_TIME}
+    volumes:
+      - prometheus_data:/prometheus
+    networks:
+      - monitor-net
+    restart: ${RESTART_POLICY}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:${PROMETHEUS_PORT}/-/ready",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  # ==============================================================================
+  # loki: Aggregates and stores logs for distributed systems,
+  # enabling efficient querying and analysis.
+  # ==============================================================================
+  loki:
+    container_name: ${LOKI_CONTAINER_NAME}
+    labels:
+      - "type=monitoring,logging,distributed_tracing"
+    image: grafana/loki:2.9.3
+    volumes:
+      - ./src/monitoring/loki:/etc/loki
+    command: -config.file=/etc/loki/loki-config.yml -config.expand-env=true
+    environment:
+      - LOKI_PORT=${LOKI_PORT}
+      - LOKI_GRPC_PORT=${LOKI_GRPC_PORT}
+      - LOKI_PATH_PREFIX=${LOKI_PATH_PREFIX}
+      - LOKI_REPLICATION_FACTOR=${LOKI_REPLICATION_FACTOR}
+      - LOKI_INDEX_PERIOD=${LOKI_INDEX_PERIOD}
+      - LOKI_ALERTMANAGER_URL=http://alertmanager:${ALERTMANAGER_PORT}
+    restart: ${RESTART_POLICY}
+    expose:
+      - ${LOKI_PORT}
+    networks:
+      monitor-net:
+  # ==============================================================================
+  # promtail: Collects logs from containers and
+  # forwards them to Loki for centralized log management.
+  # ==============================================================================
+  promtail:
+    container_name: monitoring-promtail
+    labels:
+      - "type=monitoring,log_aggregation,collection"
+    image: grafana/promtail:2.9.3
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./src/monitoring/promtail:/etc/promtail
+    command: -config.file=/etc/promtail/promtail-config.yml -config.expand-env=true
+    environment:
+      - LOKI_PORT=${LOKI_PORT}
+      - LOKI_CONTAINER_NAME=${LOKI_CONTAINER_NAME}
+    restart: ${RESTART_POLICY}
+    networks:
+      - monitor-net
+  # ==============================================================================
+  # alertmanager: Manages alerts sent by Prometheus,
+  # including routing, silencing, and notification integrations.
+  # ==============================================================================
+  alertmanager:
+    container_name: monitoring-alertmanager
+    labels:
+      - "type=monitoring,alert_management,notifications"
+    image: prom/alertmanager:v0.28.0
+    volumes:
+      - ./src/monitoring/alertmanager:/etc/alertmanager
+    environment:
+      - M_WEBHOOK_ID=${MM_WEBHOOK_ID}
+      - MM_ALERT_CHANNEL_NAME=${MM_ALERT_CHANNEL_NAME}
+      - MM_CONTAINER_PORT=${MM_CONTAINER_PORT}
+    command:
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
+    restart: ${RESTART_POLICY}
+    expose:
+      - ${ALERTMANAGER_PORT}
+    networks:
+      - monitor-net
+
+  # ==============================================================================
+  # nodeexporter: Exposes hardware and OS metrics from the host for Prometheus scraping.
+  # ==============================================================================
+  nodeexporter:
+    container_name: monitoring-nodeexporter
+    labels:
+      - "type=monitoring,hardware_metrics,system_resources"
+    image: prom/node-exporter:v1.8.2
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    restart: ${RESTART_POLICY}
+    expose:
+      - ${NODE_EXPORTER_PORT}
+    networks:
+      - monitor-net
+  # ==============================================================================
+  # cadvisor: Collects, aggregates, and exports resource usage and
+  # performance metrics for running containers.
+  # ==============================================================================
+  cadvisor:
+    container_name: monitoring-cadvisor
+    labels:
+      - "type=monitoring,container_metrics,performance"
+    image: gcr.io/cadvisor/cadvisor:v0.51.0
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    restart: ${RESTART_POLICY}
+    expose:
+      - ${CADVISOR_PORT}
+    networks:
+      - monitor-net
+  # ==============================================================================
+  # grafana: Provides dashboards and visualization for
+  # metrics and logs, supporting observability and alerting.
+  # ==============================================================================
+  grafana:
+    container_name: monitoring-grafana
+    labels:
+      - "type=monitoring,visualization,dashboards,observability"
+    build:
+      context: ./src/monitoring/grafana
+      dockerfile: Dockerfile
+      args:
+        - LOKI_PORT=${LOKI_PORT}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USERNAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=${GRAFANA_ALLOW_SIGNUP}
+      - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+    restart: ${RESTART_POLICY}
+    expose:
+      - ${GRAFANA_PORT}
+    networks:
+      - monitor-net
+  # ==============================================================================
+  # pushgateway: Accepts metrics pushed by short-lived jobs and
+  # makes them available to Prometheus.
+  # ==============================================================================
+  pushgateway:
+    container_name: monitoring-pushgateway
+    labels:
+      - "type=monitoring,metrics_gateway,batch_jobs"
+    image: prom/pushgateway:v1.11.0
+    restart: ${RESTART_POLICY}
+    expose:
+      - ${PUSHGATEWAY_PORT}
+    networks:
+      - monitor-net
+
+  # ==============================================================================
+  # caddy: Acts as a reverse proxy and access control gateway for
+  # monitoring services, providing secure public endpoints.
+  # ==============================================================================
+  caddy:
+    container_name: monitoring-caddy
+    labels:
+      - "type=monitoring,reverse_proxy,access_control"
+    image: caddy:2.9.1
+    ports:
+      - "${PUBLIC_GRAFANA_PORT}:${PUBLIC_GRAFANA_PORT}"
+      - "${PUBLIC_CADVISOR_PORT}:${PUBLIC_CADVISOR_PORT}"
+      - "${PUBLIC_PROMETHEUS_PORT}:${PUBLIC_PROMETHEUS_PORT}"
+      - "${PUBLIC_ALERTMANAGER_PORT}:${PUBLIC_ALERTMANAGER_PORT}"
+      - "${PUBLIC_PUSHGATEWAY_PORT}:${PUBLIC_PUSHGATEWAY_PORT}"
+      - "${PUBLIC_LOKI_PORT}:${PUBLIC_LOKI_PORT}"
+      - "${PUBLIC_PROMTAIL_PORT}:${PUBLIC_PROMTAIL_PORT}"
+    volumes:
+      - ./src/monitoring/caddy:/etc/caddy
+    environment:
+      - GRAFANA_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - CADDY_ADMIN_PASSWORD_HASH=${CADDY_ADMIN_PASSWORD_HASH}
+      - PUBLIC_GRAFANA_PORT=${PUBLIC_GRAFANA_PORT}
+      - GRAFANA_PORT=${GRAFANA_PORT}
+      - PUBLIC_CADVISOR_PORT=${PUBLIC_CADVISOR_PORT}
+      - CADVISOR_PORT=${CADVISOR_PORT}
+      - PUBLIC_PROMETHEUS_PORT=${PUBLIC_PROMETHEUS_PORT}
+      - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+      - PUBLIC_ALERTMANAGER_PORT=${PUBLIC_ALERTMANAGER_PORT}
+      - ALERTMANAGER_PORT=${ALERTMANAGER_PORT}
+      - PUBLIC_PUSHGATEWAY_PORT=${PUBLIC_PUSHGATEWAY_PORT}
+      - PUSHGATEWAY_PORT=${PUSHGATEWAY_PORT}
+      - PUBLIC_LOKI_PORT=${PUBLIC_LOKI_PORT}
+      - PUBLIC_PROMTAIL_PORT=${PUBLIC_PROMTAIL_PORT}
+    restart: ${RESTART_POLICY}
+    networks:
+      - monitor-net
+
+networks:
+  intranet:
+    driver: bridge
+    name: intranet
+  monitor-net:
+    driver: bridge
+volumes:
+  dagster_storage:
+  pgadmin_data:
+  prometheus_data: {}
+  grafana_data: {}

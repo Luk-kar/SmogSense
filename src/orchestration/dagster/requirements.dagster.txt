@@ -1,0 +1,5 @@
+dagster==1.8.9              # Core Dagster framework for orchestrating data pipelines and workflows
+dagster-graphql==1.8.9      # Dagster support for GraphQL
+dagster-webserver==1.8.9    # Dagster support for running a web server for monitoring and managing pipelines
+dagster-postgres==0.24.9    # Dagster support for using PostgreSQL as a storage backend
+dagster-docker==0.24.9      # Dagster integration for running pipelines in Docker containers

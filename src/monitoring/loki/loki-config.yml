@@ -1,0 +1,30 @@
+auth_enabled: false
+
+server:
+  http_listen_port: ${LOKI_PORT}
+  grpc_listen_port: ${LOKI_GRPC_PORT}
+
+common:
+  path_prefix: ${LOKI_PATH_PREFIX}
+  storage:
+    filesystem:
+      chunks_directory: ${LOKI_PATH_PREFIX}/chunks
+      rules_directory: ${LOKI_PATH_PREFIX}/rules
+  replication_factor: ${LOKI_REPLICATION_FACTOR}
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: ${LOKI_INDEX_PERIOD}
+
+ruler:
+  alertmanager_url: ${LOKI_ALERTMANAGER_URL}

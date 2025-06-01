@@ -1,0 +1,31 @@
+### Mattermost v10.0 References ###
+# 1. Slack-compatible webhooks:
+#    https://docs.mattermost.com/about/faq-integrations.html
+# 2. Slack format compatibility:
+#    https://developers.mattermost.com/integrate/slash-commands/slack/
+# 3. All documentation:
+#    https://docs.mattermost.com/
+#
+# For the full integration set up the mattermost service for alert integration
+
+route:
+  receiver: "mattermost"
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: "mattermost"
+    slack_configs:
+      - send_resolved: true
+        username: "Alertmanager"
+        channel: "${MM_ALERT_CHANNEL_NAME}"
+        api_url: "http://smogsense_mattermost:${MM_CONTAINER_PORT}/hooks/${MM_WEBHOOK_ID}"
+        title: |-
+          [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+        text: |-
+          {{ range .Alerts }}
+          **Description**: {{ .Annotations.description }}
+          **Severity**: {{ .Labels.severity }}
+          **Host**: {{ .Labels.instance }}
+          {{ end }}

@@ -1,0 +1,13 @@
+- name: Copy .env example
+  copy:
+    src: "{{ smogsense_dir }}/.env.example"
+    dest: "{{ smogsense_dir }}/.env"
+    remote_src: yes
+    force: yes
+
+- name: Copy config.ini example
+  copy:
+    src: "{{ smogsense_dir }}/src/data_acquisition/social_media/config.ini.example"
+    dest: "{{ smogsense_dir }}/src/data_acquisition/social_media/config.ini"
+    remote_src: yes
+    force: yes

@@ -1,0 +1,11 @@
+[MESSAGES CONTROL]
+# Disable specific pylint checks by their codes or names
+disable=
+    import-error,
+    invalid-name,
+    no-else-return
+
+[TYPECHECK]
+# You can configure paths for third-party modules if needed
+ignored-modules=
+ignored-classes=

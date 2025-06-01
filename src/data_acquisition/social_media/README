@@ -1,0 +1,6 @@
+# Social Media Scraping Twitter/X
+
+The provided `config.ini` file contains placeholder values. Please update these entries with your actual account authorization details before running the application.
+
+**Note:**  
+When deploying to production, make sure to add `config.ini` to your `.gitignore` file to prevent sensitive information from being committed to version control.

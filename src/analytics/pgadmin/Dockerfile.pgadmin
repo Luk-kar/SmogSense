@@ -1,0 +1,26 @@
+# Use the official pgAdmin image as the base
+FROM dpage/pgadmin4:8.13.0
+
+# Set environment variables (replace these with default values or leave empty for runtime configuration)
+ARG POSTGRES_HOST
+ARG POSTGRES_PORT
+ARG POSTGRES_WAREHOUSE_DB
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
+
+# Switch to root user to set up the directory
+USER root
+
+# Create the server configuration file and directory
+RUN mkdir -p /pgadmin4 && \
+    chmod -R 777 /pgadmin4
+
+# Switch back to the default user
+USER pgadmin
+
+# Generate the servers.json file during the build
+RUN mkdir -p /pgadmin4 && \
+    echo "{\"Servers\": {\"1\": {\"Name\": \"${POSTGRES_WAREHOUSE_DB}\", \"Group\": \"Warehouse Servers\", \"Host\": \"${POSTGRES_HOST}\", \"Port\": ${POSTGRES_PORT}, \"MaintenanceDB\": \"${POSTGRES_WAREHOUSE_DB}\", \"Username\": \"${POSTGRES_USER}\", \"Password\": \"${POSTGRES_PASSWORD}\", \"SSLMode\": \"prefer\"}}}" > /pgadmin4/servers.json
+
+# Ensure the servers.json file is in the correct location during runtime
+ENTRYPOINT ["/entrypoint.sh"]

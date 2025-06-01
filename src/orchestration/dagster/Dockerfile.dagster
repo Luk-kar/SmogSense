@@ -1,0 +1,52 @@
+# Dagster libraries to run both dagster-webserver and the dagster-daemon. Does not
+# need to have access to any pipeline code.
+
+FROM python:3.10-slim
+
+# Set $DAGSTER_HOME to the directory where your user code will live
+ENV DAGSTER_HOME=/opt/dagster/dagster_home/
+
+# Create the directory
+RUN mkdir -p $DAGSTER_HOME
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install dependencies
+COPY requirements.dagster.txt $DAGSTER_HOME/requirements.dagster.txt
+RUN pip install -r $DAGSTER_HOME/requirements.dagster.txt
+
+# Declare build arguments for the required pipeline ports
+ARG AIR_QUALITY_PIPELINE_PORT
+ARG HEALTH_PIPELINE_PORT
+ARG SOCIAL_MEDIA_PIPELINE_PORT
+ARG WAREHOUSE_PIPELINE_PORT
+ARG TERRITORY_PIPELINE_PORT
+ARG MODELS_PIPELINE_PORT
+ARG POSTGRES_HOST_PORT
+
+# Set these build args as environment variables so the generator can use them
+ENV AIR_QUALITY_PIPELINE_PORT=${AIR_QUALITY_PIPELINE_PORT}
+ENV HEALTH_PIPELINE_PORT=${HEALTH_PIPELINE_PORT}
+ENV SOCIAL_MEDIA_PIPELINE_PORT=${SOCIAL_MEDIA_PIPELINE_PORT}
+ENV WAREHOUSE_PIPELINE_PORT=${WAREHOUSE_PIPELINE_PORT}
+ENV TERRITORY_PIPELINE_PORT=${TERRITORY_PIPELINE_PORT}
+ENV MODELS_PIPELINE_PORT=${MODELS_PIPELINE_PORT}
+ENV POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT}
+
+# Copy the files needed for generating workspace.yaml
+COPY workspace_generator.py $DAGSTER_HOME/
+COPY workspace.yaml.jinja $DAGSTER_HOME/
+
+# Copy the files needed for generating dagster.yaml
+COPY dagster_generator.py $DAGSTER_HOME/
+COPY dagster.yaml.jinja $DAGSTER_HOME/
+
+
+# Set the working directory
+WORKDIR $DAGSTER_HOME
+
+# Generate workspace.yaml and dagster.yaml
+# using the generator script (which uses the environment variables)
+RUN python workspace_generator.py
+RUN python dagster_generator.py
