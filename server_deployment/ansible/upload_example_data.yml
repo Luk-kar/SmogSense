@@ -1,0 +1,17 @@
+---
+- name: Materialize Dagster assets in smogsense_dagster_warehouse_code
+  hosts: ubuntu
+  become: true
+
+  tasks:
+    - name: Run dagster asset materialize inside container
+      shell: |
+        docker exec smogsense_dagster_warehouse_code \
+          dagster asset materialize \
+            -a upload_example_project_data_to_minio \
+            -a restore_example_project_database
+      register: dagster_asset_materialize
+
+    - name: Show output from asset materialization
+      debug:
+        var: dagster_asset_materialize.stdout

@@ -137,9 +137,9 @@ resource "azurerm_linux_virtual_machine" "ubuntu_vm" {
   name                            = "${var.resource_group}-vm"
   location                        = "${var.location}"
   resource_group_name             = azurerm_resource_group.rg.name
-  size                            = "Standard_B2s"
+  size                            = "Standard_F4s_v2" # If more CPUs needed change the Regional Cores quota. Now set to default.
   admin_username                  = "${var.admin_username}"
-  disable_password_authentication = false # to use demote desktop connection like Remmina
+  disable_password_authentication = false # to use remote desktop connection like Remmina
   admin_password                  = "${var.admin_password}"
 
   network_interface_ids = [
@@ -154,7 +154,8 @@ resource "azurerm_linux_virtual_machine" "ubuntu_vm" {
   os_disk {
     name                 = "${var.resource_group}-osdisk"
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "Premium_LRS"
+    disk_size_gb         = 256
   }
 
   source_image_reference {

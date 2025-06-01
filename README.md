@@ -59,6 +59,24 @@ docker compose down
 docker compose up dagster_user_code dagster_webserver dagster_daemon
 docker compose up dagster_code_social_media dagster_daemon dagster_webserver
 ```
+
+### Removing runs dagster images:
+[Remove Docker Container Based On Regex](https://www.jamescoyle.net/how-to/2878-remove-docker-container-based-on-regex#:~:text=docker%20ps%20%2D%2Dfilter%20name%3DNAMEHERE%20%2Daq%20%7C%20xargs%20docker%20stop%20%7C%20xargs%20docker%20rm)
+```
+# This will stop and remove all containers with names starting with "dagster-run"
+docker ps --filter "name=dagster-run" -aq | xargs -r docker rm -f
+```
+Use from time to time to free disk space when the:
+```
+run_launcher:
+  module: dagster_docker
+  class: DockerRunLauncher
+  config:
+    container_kwargs:
+      auto_remove: true
+```
+Set the `auto_remove: false` for runs debugging. Not recommended in production due to high disk usage.
+
 ### Useful paths:
 Path for temporary storage
 ```

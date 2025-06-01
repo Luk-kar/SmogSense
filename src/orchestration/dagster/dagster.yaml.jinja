@@ -29,6 +29,8 @@ run_launcher:
         /var/run/docker.sock:
           bind: /var/run/docker.sock
           mode: rw
+      # https://github.com/dagster-io/dagster/discussions/9739
+      auto_remove: true
 
 run_storage:
   module: dagster_postgres.run_storage
