@@ -1,17 +1,51 @@
 ---
-- name: Materialize Dagster assets in smogsense_dagster_warehouse_code
+- name: Materialize Dagster assets in smogsense_dagster_warehouse_code responsible for uploading example data
   hosts: ubuntu
   become: true
 
   tasks:
-    - name: Run dagster asset materialize inside container
+    - name: Run dagster asset to restore example project database
       shell: |
         docker exec smogsense_dagster_warehouse_code \
           dagster asset materialize \
-            -a upload_example_project_data_to_minio \
-            -a restore_example_project_database
+            --select restore_example_project_database \
+            -m my_project.warehouse
       register: dagster_asset_materialize
 
-    - name: Show output from asset materialization
+    - name: Show output from restoring database asset materialization
       debug:
         var: dagster_asset_materialize.stdout
+
+    - name: Run dagster asset to upload example project data to MinIO
+      shell: |
+        docker exec smogsense_dagster_warehouse_code \
+          dagster asset materialize \
+            --select upload_example_project_data_to_minio \
+            -m my_project.warehouse
+      register: dagster_minio_materialize
+
+    - name: Show output from MinIO uploading data asset materialization
+      debug:
+        var: dagster_minio_materialize.stdout
+
+    - name: Upload dashboard_social_media.zip to Superset BI tool
+      shell: |
+        docker exec -it smogsense_superset superset import-dashboards \
+          -u admin \
+          -p /tmp/superset/dashboards/dashboard_social_media.zip
+      register: upload_dashboard_social_media
+
+    - name: Show output from uploading dashboard_social_media.zip
+      debug:
+        var: upload_dashboard_social_media.stdout
+
+    - name: Upload dashboard_air_pollution.zip to Superset BI tool
+      shell: |
+        docker exec -it smogsense_superset superset import-dashboards \
+          -u admin \
+          -p /tmp/superset/dashboards/dashboard_air_pollution.zip
+      register: upload_dashboard_air_pollution
+
+    - name: Show output from uploading dashboard_air_pollution.zip
+      debug:
+        var: upload_dashboard_air_pollution.stdout

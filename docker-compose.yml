@@ -661,6 +661,8 @@ services:
         condition: service_healthy
       dagster_code_territory:
         condition: service_healthy
+      dagster_code_models_deployment:
+        condition: service_healthy
 
   # ==============================================================================
   # dagster_daemon: Pulls runs from the queue for execution and handles scheduling.

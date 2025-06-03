@@ -100,6 +100,11 @@ The main playbook, `ansible/full_setup.yml`, orchestrates the entire setup proce
   ansible-playbook -i "./ansible/inventory.yaml" "./ansible/services_stop.yml"
   ```
 
+- **To start from the task:**
+  ```sh
+  ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.yml" \
+  --start-at-task "Upload dashboard_social_media.zip to Superset BI tool"
+  ```
 ---
 
 **Tip:**  
