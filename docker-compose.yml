@@ -173,7 +173,7 @@ services:
         condition: service_started
     volumes:
       - ./src/analytics/superset/entrypoint.sh:/entrypoint.sh
-      - ./src/analytics/superset/dashboards/:/tmp/superset/dashboards/
+      - ./src/analytics/superset/dashboards/:/tmp/superset/dashboards/:ro
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
     networks:
       - intranet
