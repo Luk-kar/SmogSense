@@ -31,17 +31,17 @@ superset set-database-uri \
     --database_name warehouse_db \
     --uri "postgresql://${SUPERSET_DB_USER}:${SUPERSET_DB_PASSWORD}@${SUPERSET_DB_HOST}:${SUPERSET_DB_PORT}/${POSTGRES_WAREHOUSE_DB}"
 
-# TODO: You can upload these in the UI from src/analytics/superset/dashboards, for now uploading dashboards by CLI is broken
-# Echo all dashboard ZIP files in the mounted directory
-# echo "Found the following dashboard ZIP files in /tmp/superset/dashboards/:"
+# BUG: superset.commands.exceptions.CommandInvalidError: Error importing dashboard, do via ansible instead
+# # Import dashboards from ZIP files
+# echo "Looking for dashboard ZIP files in /tmp/superset/dashboards/..."
 # for file in /tmp/superset/dashboards/*.zip; do
-#     echo " - $file"
-# done
-
-# # Import each dashboard ZIP file using the admin username
-# for file in /tmp/superset/dashboards/*.zip; do
-#     echo "Importing dashboards from $file"
-#     superset import-dashboards -p "$file" --username "${SUPERSET_ADMIN_USERNAME}"
+#     if [ -e "$file" ]; then
+#         echo "Importing dashboards from $file"
+#         superset import-dashboards -u "${SUPERSET_ADMIN_USERNAME}" -p "$file"
+#     else
+#         echo "No dashboard ZIP files found in /tmp/superset/dashboards/"
+#         break
+#     fi
 # done
 
 echo "Remember to provide the correct password for the POSTGRES_WAREHOUSE_DB connection in the Superset UI."
