@@ -11,10 +11,12 @@
             --select restore_example_project_database \
             -m my_project.warehouse
       register: dagster_asset_materialize
+      tags: upload_data
 
     - name: Show output from restoring database asset materialization
       debug:
         var: dagster_asset_materialize.stdout
+      tags: upload_data
 
     - name: Run dagster asset to upload example project data to MinIO
       shell: |
@@ -23,10 +25,12 @@
             --select upload_example_project_data_to_minio \
             -m my_project.warehouse
       register: dagster_minio_materialize
+      tags: upload_data
 
     - name: Show output from MinIO uploading data asset materialization
       debug:
         var: dagster_minio_materialize.stdout
+      tags: upload_data
 
     - name: Upload dashboard_social_media.zip to Superset BI tool
       shell: |
@@ -34,10 +38,12 @@
           -u admin \
           -p /tmp/superset/dashboards/dashboard_social_media.zip
       register: upload_dashboard_social_media
+      tags: upload_dashboard
 
     - name: Show output from uploading dashboard_social_media.zip
       debug:
         var: upload_dashboard_social_media.stdout
+      tags: upload_dashboard
 
     - name: Upload dashboard_air_pollution.zip to Superset BI tool
       shell: |
@@ -45,7 +51,9 @@
           -u admin \
           -p /tmp/superset/dashboards/dashboard_air_pollution.zip
       register: upload_dashboard_air_pollution
+      tags: upload_dashboard
 
     - name: Show output from uploading dashboard_air_pollution.zip
       debug:
         var: upload_dashboard_air_pollution.stdout
+      tags: upload_dashboard
