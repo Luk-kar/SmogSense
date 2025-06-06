@@ -49,6 +49,22 @@ The main playbook, `ansible/full_setup.yml`, orchestrates the entire setup proce
 - Hosts and credentials are managed via `ansible/inventory.yaml` and group variables in `ansible/group_vars/ubuntu.yml`.
 - Environment variables (such as host, username, password, and SSH key) are loaded from `server_deployment/.env`.
 
+### Adding fingerprint to your known_hosts to use ansible
+
+removing old key
+
+```
+ssh-keygen -R 172.161.000.01
+```
+
+adding new key fingerprint
+
+```
+ ssh adminuser@172.161.000.02
+ ...
+ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+```
+
 ### **Basic Workflow**
 
 1. **Load environment variables:**

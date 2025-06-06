@@ -1,0 +1,16 @@
+- name: Ensure apt cache is updated
+  ansible.builtin.apt:
+    update_cache: yes
+  tags: browser
+
+- name: Install Chromium browser
+  ansible.builtin.apt:
+    name: chromium-browser
+    state: present
+  tags: browser
+
+- name: Set Chromium as the default browser for all users
+  ansible.builtin.shell: |
+    update-alternatives --set x-www-browser /usr/bin/chromium-browser
+    update-alternatives --set gnome-www-browser /usr/bin/chromium-browser
+  tags: browser

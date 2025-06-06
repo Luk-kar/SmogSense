@@ -7,6 +7,12 @@
     - docker
     - xrdp
 
+- name: Installing default browser
+  hosts: ubuntu
+  become: true
+  roles:
+    - browser
+
 - name: Application setup
   hosts: ubuntu
   become: true

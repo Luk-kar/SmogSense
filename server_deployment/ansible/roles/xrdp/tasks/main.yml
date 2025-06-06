@@ -2,22 +2,26 @@
   apt:
     name: xfce4
     state: present
+  tags: xrdp
 
 - name: Install xfce4-session
   apt:
     name: xfce4-session
     state: present
+  tags: xrdp
 
 - name: Install xrdp
   apt:
     name: xrdp
     state: present
+  tags: xrdp
 
 - name: Enable xrdp service
   service:
     name: xrdp
     enabled: yes
     state: started
+  tags: xrdp
 
 - name: Configure xrdp session
   ansible.builtin.lineinfile:
@@ -26,8 +30,10 @@
     create: yes
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
+  tags: xrdp
 
 - name: Restart xrdp service
   service:
     name: xrdp
     state: restarted
+  tags: xrdp

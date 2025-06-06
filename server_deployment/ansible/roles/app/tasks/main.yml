@@ -3,16 +3,19 @@
     path: "{{ repository_dir}}"
     state: directory
     mode: "0755"
+  tags: app
 
 - name: Check if SmogSense repo directory exists
   stat:
     path: "{{ smogsense_dir }}"
   register: smogsense_repo_dir
+  tags: app
 
 - name: Check if .git directory exists inside SmogSense repo
   stat:
     path: "{{ smogsense_dir }}/.git"
   register: smogsense_git_dir
+  tags: app
 
 - name: Clone repository
   git:
@@ -20,6 +23,7 @@
     dest: "{{ smogsense_dir }}"
     update: yes
   when: not smogsense_repo_dir.stat.exists
+  tags: app
 
 - name: Make test scripts executable
   file:
@@ -29,3 +33,4 @@
     - run_tests_all.sh
     - run_tests_data_air_quality.sh
     - run_tests_data_health.sh
+  tags: app

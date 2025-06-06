@@ -6,13 +6,16 @@
     - run_tests_all.sh
     - run_tests_data_air_quality.sh
     - run_tests_data_health.sh
+  tags: deploy
 
 - name: Build Docker images
   shell: docker compose build
   args:
     chdir: "{{ smogsense_dir }}"
+  tags: deploy
 
 - name: Start services
   community.docker.docker_compose_v2:
     project_src: "{{ smogsense_dir }}"
     state: present
+  tags: deploy

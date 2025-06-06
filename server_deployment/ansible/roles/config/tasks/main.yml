@@ -4,6 +4,7 @@
     dest: "{{ smogsense_dir }}/.env"
     remote_src: yes
     force: yes
+  tags: config
 
 - name: Copy config.ini example
   copy:
@@ -11,3 +12,4 @@
     dest: "{{ smogsense_dir }}/src/data_acquisition/social_media/config.ini"
     remote_src: yes
     force: yes
+  tags: config

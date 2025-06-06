@@ -2,16 +2,19 @@
   ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+  tags: docker
 
 - name: Add Docker repository
   ansible.builtin.apt_repository:
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
     state: present
     filename: docker
+  tags: docker
 
 - name: Update apt cache after adding Docker repo
   apt:
     update_cache: yes
+  tags: docker
 
 - name: Install Docker and Docker Compose plugin
   apt:
@@ -21,15 +24,18 @@
       - containerd.io
       - docker-compose-plugin
     state: present
+  tags: docker
 
 - name: Add user to docker group
   user:
     name: "{{ ansible_user }}"
     groups: docker
     append: yes
+  tags: docker
 
 - name: Ensure docker service is running
   service:
     name: docker
     state: started
     enabled: yes
+  tags: docker

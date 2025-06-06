@@ -1,6 +1,7 @@
 - name: Update apt cache
   apt:
     update_cache: yes
+  tags: common
 
 - name: Install core dependencies
   apt:
@@ -11,3 +12,4 @@
       - software-properties-common
       - git
     state: present
+  tags: common
