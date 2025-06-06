@@ -1,0 +1,12 @@
+:8090 {
+    route {
+        basic_auth /* {
+            {$CADDY_SUPERSET_USER} {$CADDY_SUPERSET_PASSWORD_HASH}
+        }
+        reverse_proxy superset:8088 {
+            transport http {
+                max_conns_per_host 40  # Limit to 40 concurrent connections to the backend for safety.
+            }
+        }
+    }
+}

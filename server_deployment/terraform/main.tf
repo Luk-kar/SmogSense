@@ -99,6 +99,21 @@ resource "azurerm_network_security_group" "ubuntu_vm_nsg" {
   }
 }
 
+resource "azurerm_network_security_rule" "allow_superset_caddy" {
+  name                       = "AllowSupersetCaddy"
+  priority                   = 1010
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "8090"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+
+  resource_group_name         = azurerm_resource_group.rg.name
+  network_security_group_name = azurerm_network_security_group.ubuntu_vm_nsg.name
+}
+
 # Network Interface
 resource "azurerm_network_interface" "ubuntu_vm_nic" {
   name                = "${var.resource_group}-nic"

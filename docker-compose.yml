@@ -164,12 +164,14 @@ services:
         }
       SUPERSET_CELERY_BROKER_URL: redis://${CACHE_REDIS_HOST}:${CACHE_REDIS_PORT}/0
       SUPERSET_CELERY_RESULT_BACKEND: redis://${CACHE_REDIS_HOST}:${CACHE_REDIS_PORT}/0
-    ports:
-      - ${SUPERSET_HOST_PORT}:${SUPERSET_CONTAINER_PORT}
+    # ports:
+    #   - ${SUPERSET_HOST_PORT}:${SUPERSET_CONTAINER_PORT}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_started
+      superset_caddy:
         condition: service_started
     volumes:
       - ./src/analytics/superset/entrypoint.sh:/entrypoint.sh
@@ -177,6 +179,23 @@ services:
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
     networks:
       - intranet
+      - superset_net
+
+  # ==============================================================================
+  # superset_caddy: Acts as a reverse proxy for Superset, providing secure access and authentication.
+  # ==============================================================================
+  superset_caddy:
+    image: caddy:2.9.1
+    container_name: superset_caddy
+    volumes:
+      - ./src/public_gateway/caddy/Caddyfile:/etc/caddy/Caddyfile
+    environment:
+      - CADDY_SUPERSET_USER=${CADDY_SUPERSET_USER}
+      - CADDY_SUPERSET_PASSWORD_HASH=${CADDY_SUPERSET_PASSWORD_HASH}
+    ports:
+      - "8090:8090" # Expose only the proxy, not Superset directly
+    networks:
+      - superset_net
 
   # ==============================================================================
   # Redis: Provides caching and message queuing for Superset's background tasks and data processing.
@@ -966,6 +985,9 @@ networks:
     name: intranet
   monitor-net:
     driver: bridge
+  superset_net:
+    driver: bridge
+    name: superset_net
 volumes:
   dagster_storage:
   pgadmin_data:
