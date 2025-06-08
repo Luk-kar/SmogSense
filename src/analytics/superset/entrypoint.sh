@@ -46,6 +46,13 @@ superset set-database-uri \
 
 echo "Remember to provide the correct password for the POSTGRES_WAREHOUSE_DB connection in the Superset UI."
 
+mkdir -p /app/pythonpath
+# Create superset_config.py with PUBLIC_ROLE_LIKE setting
+cat <<EOF > /app/pythonpath/superset_config.py
+PUBLIC_ROLE_LIKE = "Gamma"
+EOF
+echo "Created /app/pythonpath/superset_config.py with PUBLIC_ROLE_LIKE = 'Gamma'"
+echo "Exposed public role for anonymous access to dashboards."
 
 # Start the Superset server
 superset run -h 0.0.0.0 -p "${SUPERSET_HOST_PORT}" --with-threads --reload --debugger
