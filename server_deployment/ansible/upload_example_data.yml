@@ -30,7 +30,12 @@
     - name: Show output from MinIO uploading data asset materialization
       debug:
         var: dagster_minio_materialize.stdout
-      tags: upload_data
+      tags:
+        upload_data
+
+        # Note: It is generally recommended to upload dashboards manually using the Superset UI.
+        # The command below may fail if database passwords are not already configured in Superset.
+        # It will only work if the necessary credentials have been previously provided.
 
     - name: Upload dashboard_social_media.zip to Superset BI tool
       shell: |
