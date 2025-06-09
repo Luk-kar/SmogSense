@@ -1,144 +1,75 @@
-
 # SmogSense Deployment and Management Guide
-Provides a consolidated overview of the necessary commands and steps for setting up, deploying, and maintaining the SmogSense project. It aims to streamline operations by offering quick access to essential procedures for infrastructure management and application deployment.
 
-## environments
+This guide provides a concise overview for setting up, deploying, and managing the SmogSense project using Terraform and Ansible. It is designed to streamline infrastructure provisioning and application deployment.
 
-- load environment variables at ``server_deployment/.env`:
-```
+---
+
+## Environment Setup
+
+Load environment variables for deployment:
+
+```sh
 cd server_deployment
 set -a
 source .env
 set +a
 ```
 
-## terraform usefull commands:
-Terraform is an infrastructure-as-code tool that allows you to provision, validate, and manage cloud infrastructure in automated way.
+Ensure all required variables are set in `.env` (see `.env.example` for reference):
 
-Use these commands to: 
+```sh
+# Terraform Configuration
+TF_VAR_subscription_id=your-subscription-id-here
+TF_VAR_resource_group=your-resource-group-name-here
+TF_VAR_location="Your Azure Region Here" # e.g., "Switzerland North"
+TF_VAR_admin_username="your-admin-username-here"
+TF_VAR_admin_password="your-secure-password-here"
 
-- load environment variables at ``server_deployment/.env`:
-
-- initialize your Terraform environment:
-```
-terraform init
-```
-- check your configuration:
-```
-terraform validate
-```
-- apply infrastructure changes:
-```
-terraform apply
+# Ansible Configuration
+ANSIBLE_HOST=000.000.00.000
+ANSIBLE_SSH_PRIVATE_KEY_FILE="/some_path/.ssh/vm_private_key.pem"
+ANSIBLE_PYTHON_INTERPRETER="/usr/bin/python3"
 ```
 ---
-destroying the virtual machines instead of the all resourcess:
+
+## Terraform Commands
+
+Terraform automates cloud infrastructure provisioning.
+
+**Initialize Terraform:**
+```sh
+cd terraform/azure  # or terraform/oracle, depending on your target
+terraform init
 ```
+
+**Validate configuration:**
+```sh
+terraform validate
+```
+
+**Apply infrastructure changes:**
+```sh
+terraform apply
+```
+
+**Destroy specific resources (e.g., only VMs and keys):**
+```sh
 terraform destroy \
   -target=azurerm_linux_virtual_machine.ubuntu_vm \
   -target=tls_private_key.ubuntu_vm_key
 ```
-## ansible useful commands
-
-Ansible is an automation tool for configuring servers, deploying applications, and orchestrating complex workflows.
-
-The main playbook, `ansible/full_setup.yml`, orchestrates the entire setup process, including system preparation, application deployment, configuration, and service startup. The roles are modular and reusable.
-
-### **Inventory and Variables**
-
-- Hosts and credentials are managed via `ansible/inventory.yaml` and group variables in `ansible/group_vars/ubuntu.yml`.
-- Environment variables (such as host, username, password, and SSH key) are loaded from `server_deployment/.env`.
-
-### Adding fingerprint to your known_hosts to use ansible
-
-removing old key
-
-```
-ssh-keygen -R 172.161.000.01
-```
-
-adding new key fingerprint
-
-```
- ssh adminuser@172.161.000.02
- ...
- Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-```
-
-### **Basic Workflow**
-
-1. **Load environment variables:**
-   ```sh
-   cd server_deployment
-   set -a
-   source .env
-   set +a
-   ```
-
-2. **Run the full setup (recommended for first-time deployment or full re-provisioning):**
-   ```sh
-   ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml"
-   ```
-
-   This playbook will:
-   - Set up the base system (`common`, `docker`, `xrdp` roles)
-   - Deploy the application code (`app` role)
-   - Configure environment and application files (`config` role)
-   - Deploy and start all services (`deploy` role)
-
-3. **Run Individual Steps Using Tags, or Stop Services**
-
-- **To run only a specific part of the setup, use Ansible tags with the `full_setup.yml` playbook.**  
-  For example, to run only the Docker installation tasks (assuming those tasks are tagged `docker`):
-
-  ```sh
-  ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml" --tags docker
-  ```
-
-- **Common tags you might use:**  
-  (Replace with your actual tag names as defined in your playbook)
-  - `common`
-  - `docker`
-  - `xrdp`
-  - `app`
-  - `config`
-  - `deploy`
-
-  Example to run only the deploy step:
-  ```sh
-  ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml" --tags deploy
-  ```
-
-- **To stop all services:**  
-  Use the provided `services_stop.yml` playbook:
-
-  ```sh
-  ansible-playbook -i "./ansible/inventory.yaml" "./ansible/services_stop.yml"
-  ```
-
-- **To start from the task:**
-  ```sh
-  ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.yml" \
-  --start-at-task "Upload dashboard_social_media.zip to Superset BI tool"
-  ```
 ---
 
-**Tip:**  
-You can combine multiple tags with a comma:  
-```sh
-ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml" --tags "docker,deploy"
-```
+## Ansible Automation
 
-### **Role Overview**
+Ansible manages server configuration and application deployment.
 
-- **common**: Installs system dependencies and updates the package cache.
-- **docker**: Installs Docker and Docker Compose, ensures the user is in the docker group, and starts the Docker service.
-- **xrdp**: Installs and configures the XFCE desktop environment and XRDP for remote desktop access.
-- **app**: Clones the SmogSense repository and prepares application scripts.
-- **config**: Copies example environment and configuration files into place.
-- **deploy**: Runs tests, builds Docker images, and starts all services via Docker Compose.
+**Inventory and Variables**
 
-### **Inventory Example (`ansible/inventory.yaml`):**
+- **Hosts and credentials:** Managed via `ansible/inventory.yaml` and group variables in `ansible/group_vars/ubuntu.yml`.
+- **Environment variables:** Loaded from `server_deployment/.env`.
+
+**Example inventory.yaml:**
 ```yaml
 all:
   children:
@@ -151,40 +82,124 @@ all:
           ansible_ssh_private_key_file: "{{ lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY_FILE') }}"
 ```
 
-### **Group Variables Example (`ansible/group_vars/ubuntu.yml`):**
+**Example group_vars/ubuntu.yml:**
 ```yaml
 smogsense_repo: "https://github.com/Luk-kar/SmogSense"
-repository_dir: "/home/{{ ansible_user }}/smogsense-server"
+repository_dir: "/home/{{ ansible_user }}"
 smogsense_dir: "{{ repository_dir }}/SmogSense"
 ```
 
-## shh connection:
-SSH (Secure Shell) is a cryptographic protocol that enables secure remote login and command execution on remote servers over an unsecured network.
+---
 
-Use the following command to securely connect to your remote virtual machine using your private SSH key:
-```
+Certainly! Here is the revised **Ansible Workflow** section for the README, incorporating the `upload_example_data.yml` playbook after the third point:
+
+---
+
+## Ansible Workflow
+
+**1. Load environment variables:**
+```sh
 cd server_deployment
-ssh -i ./terraform/vm_private_key.pem user@198.51.100.1
+set -a
+source .env
+set +a
 ```
 
-## copying files from your local machine to remote VM:
-
+**2. Run full setup (recommended for first-time deployment):**
+```sh
+ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml"
 ```
+This playbook executes all roles: `common`, `docker`, `xrdp`, `app`, `config`, and `deploy`.
+
+**3. Run specific roles using tags:**
+```sh
+ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml" --tags docker,deploy
+```
+Common tags: `common`, `docker`, `xrdp`, `app`, `config`, `deploy`.
+
+**4. Upload example data to Superset BI tool:**
+```sh
+ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.yml" --tags upload_data
+```
+This playbook is designed to upload sample datasets and dashboards to the Superset BI tool. However, due to database password restrictions or missing permissions, the automatic upload may fail. In such cases, it is recommended to upload dashboards manually through the Superset user interface.
+
+**5. Stop all services:**
+```sh
+ansible-playbook -i "./ansible/inventory.yaml" "./ansible/services_stop.yml"
+```
+
+**6. Start from a specific task:**
+```sh
+ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.yml" \
+  --start-at-task "Upload dashboard_social_media.zip to Superset BI tool"
+```
+
+---
+
+Here is the updated **Role Overview** section, now including the `browser` step, with a concise description based on the provided tasks:
+
+---
+
+## Role Overview
+
+- **common:** Installs system dependencies and updates packages.
+- **docker:** Installs Docker and Docker Compose, configures user groups, and starts Docker.
+- **xrdp:** Installs XFCE and XRDP for remote desktop access.
+- **app:** Clones the SmogSense repository and prepares application scripts.
+- **config:** Copies environment and configuration files.
+- **deploy:** Runs tests, builds Docker images, and starts services via Docker Compose.
+- **browser:** Updates the package index, installs the Chromium browser, and sets Chromium as the default browser for all users[7].
+
+---
+
+## SSH and File Transfer
+
+**SSH to your VM:**
+```sh
+ssh -i ./path_to_cloud_provider/vm_private_key.pem user@198.51.100.1
+```
+
+**Copy files to your VM:**
+```sh
 scp /path/to/file username@198.51.100.1:/path/to/destination
 ```
 
-## resource usage (RAM/CPU/DISK)
-```
-# Disk usage (used / total and percent used)
+---
+
+## Resource Monitoring
+
+**Disk usage:**
+```sh
 df --total -h | awk '/total/ {print "Disk Used: " $3 " / " $2 " (" $5 " used)"}'
+```
 
-# RAM usage (used / total and percent used)
+**RAM usage:**
+```sh
 free -h | awk '/Mem:/ {printf("RAM Used: %s / %s (%.2f%% used)\n", $3, $2, $3/$2*100)}'
+```
 
-# CPU usage (used / total and percent available)
+**CPU usage:**
+```sh
 top -bn2 | grep '%Cpu' | tail -1 | awk '{used=100-$8; printf("CPU Used: %.2f%% / 100%% (Available: %.2f%%)\n", used, 100-used)}'
 ```
 
-## remote desktop connection
-For a graphical remote desktop connection, you can use Remmina, a versatile remote desktop client.
-https://remmina.org/
+---
+
+## Remote Desktop Access
+
+For graphical remote desktop, use [Remmina](https://remmina.org/).
+
+---
+
+## Adding SSH Host Key Fingerprint
+
+**Remove old key:**
+```sh
+ssh-keygen -R 172.161.000.01
+```
+
+**Add new key fingerprint:**
+```sh
+ssh adminuser@172.161.000.02
+# When prompted, accept the fingerprint with 'yes'
+```

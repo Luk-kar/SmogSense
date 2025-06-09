@@ -2,8 +2,6 @@
 - name: Stop SmogSense services and check running containers
   hosts: ubuntu
   become: true
-  vars:
-    smogsense_dir: "/home/{{ ansible_user }}/smogsense-server/SmogSense"
 
   tasks:
     - name: Stop SmogSense containers
