@@ -193,8 +193,7 @@ services:
       - CADDY_SUPERSET_USER=${CADDY_SUPERSET_USER}
       - CADDY_SUPERSET_PASSWORD_HASH=${CADDY_SUPERSET_PASSWORD_HASH}
     ports:
-      - "80:80" # For HTTP redirects
-      - "443:443" # For HTTPS
+      - "8090:8090" # Expose only the proxy, not Superset directly
     networks:
       - superset_net
 

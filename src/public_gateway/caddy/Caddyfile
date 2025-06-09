@@ -1,7 +1,4 @@
-:443 {
-    tls self_signed {
-        key_type ed25519
-    }
+:8090 {
     route {
         basic_auth /* {
             {$CADDY_SUPERSET_USER} {$CADDY_SUPERSET_PASSWORD_HASH}
