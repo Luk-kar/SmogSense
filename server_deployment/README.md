@@ -167,6 +167,12 @@ cd server_deployment
 ssh -i ./terraform/vm_private_key.pem user@198.51.100.1
 ```
 
+## copying files from your local machine to remote VM:
+
+```
+scp /path/to/file username@198.51.100.1:/path/to/destination
+```
+
 ## resource usage (RAM/CPU/DISK)
 ```
 # Disk usage (used / total and percent used)

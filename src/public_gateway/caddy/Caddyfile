@@ -1,3 +1,7 @@
+# Caddy cannot provide a secure HTTPS connection to bare IP addresses by default.
+# This is because browsers and TLS standards (RFC 6066) do not treat IPs as valid ServerNames for TLS certificates.
+# For more details, see: https://caddy.community/t/this-site-can-t-provide-a-secure-connection/5681/2
+
 :8090 {
     route {
         basic_auth /* {
