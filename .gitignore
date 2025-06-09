@@ -138,8 +138,8 @@ output/
 output.md
 
 # Terraform
-server_deployment/terraform/*.tfstate*
-server_deployment/terraform/.terraform/
-server_deployment/terraform/terraform.tfvars
-server_deployment/terraform/*.pem
-server_deployment/terraform/*.key
+server_deployment/terraform/*/terraform.tfstate
+server_deployment/terraform/*/.terraform/
+server_deployment/terraform/*/terraform.tfvars
+server_deployment/terraform/*/*.pem
+server_deployment/terraform/*/*.key
