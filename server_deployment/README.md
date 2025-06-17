@@ -2,7 +2,6 @@
 
 This guide provides a concise overview for setting up, deploying, and managing the SmogSense project using Terraform and Ansible. It is designed to streamline infrastructure provisioning and application deployment.
 
----
 
 ## Environment Setup
 
@@ -38,7 +37,7 @@ Terraform automates cloud infrastructure provisioning.
 
 **Initialize Terraform:**
 ```sh
-cd terraform/azure  # or terraform/oracle, depending on your target
+cd terraform/azure  # or terraform/aws  or /gcp or /any_other_cloud_service, depending on your target
 terraform init
 ```
 
@@ -89,13 +88,7 @@ repository_dir: "/home/{{ ansible_user }}"
 smogsense_dir: "{{ repository_dir }}/SmogSense"
 ```
 
----
-
-Certainly! Here is the revised **Ansible Workflow** section for the README, incorporating the `upload_example_data.yml` playbook after the third point:
-
----
-
-## Ansible Workflow
+### Ansible Workflow
 
 **1. Load environment variables:**
 ```sh
@@ -121,7 +114,7 @@ Common tags: `common`, `docker`, `xrdp`, `app`, `config`, `deploy`.
 ```sh
 ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.yml" --tags upload_data
 ```
-This playbook is designed to upload sample datasets and dashboards to the Superset BI tool. However, due to database password restrictions or missing permissions, the automatic upload may fail. In such cases, it is recommended to upload dashboards manually through the Superset user interface.
+*This playbook is designed to upload sample datasets and dashboards to the Superset BI tool. However, due to database password restrictions or missing permissions, the automatic upload may fail. In such cases, it is recommended to upload dashboards manually through the Superset user interface.*
 
 **5. Stop all services:**
 ```sh
@@ -136,10 +129,6 @@ ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.ym
 
 ---
 
-Here is the updated **Role Overview** section, now including the `browser` step, with a concise description based on the provided tasks:
-
----
-
 ## Role Overview
 
 - **common:** Installs system dependencies and updates packages.
@@ -148,7 +137,7 @@ Here is the updated **Role Overview** section, now including the `browser` step,
 - **app:** Clones the SmogSense repository and prepares application scripts.
 - **config:** Copies environment and configuration files.
 - **deploy:** Runs tests, builds Docker images, and starts services via Docker Compose.
-- **browser:** Updates the package index, installs the Chromium browser, and sets Chromium as the default browser for all users[7].
+- **browser:** Updates the package index, installs the Chromium browser, and sets Chromium as the default browser for all users.
 
 ---
 
@@ -156,12 +145,12 @@ Here is the updated **Role Overview** section, now including the `browser` step,
 
 **SSH to your VM:**
 ```sh
-ssh -i ./path_to_cloud_provider/vm_private_key.pem user@198.51.100.1
+ssh -i /path_to/cloud_provider/vm_private_key.pem user@198.51.100.1
 ```
 
 **Copy files to your VM:**
 ```sh
-scp /path/to/file username@198.51.100.1:/path/to/destination
+scp /path_to/file username@198.51.100.1:/path/to/destination
 ```
 
 ---
@@ -172,26 +161,36 @@ scp /path/to/file username@198.51.100.1:/path/to/destination
 ```sh
 df --total -h | awk '/total/ {print "Disk Used: " $3 " / " $2 " (" $5 " used)"}'
 ```
-
+```
+Disk Used: 45G / 100G (45% used)
+```
 **RAM usage:**
 ```sh
 free -h | awk '/Mem:/ {printf("RAM Used: %s / %s (%.2f%% used)\n", $3, $2, $3/$2*100)}'
 ```
-
+```
+RAM Used: 6.2G / 16G (38.75% used)
+```
 **CPU usage:**
 ```sh
 top -bn2 | grep '%Cpu' | tail -1 | awk '{used=100-$8; printf("CPU Used: %.2f%% / 100%% (Available: %.2f%%)\n", used, 100-used)}'
 ```
+```
+CPU Used: 23.45% / 100% (Available: 76.55%)
 
+```
 ---
 
 ## Remote Desktop Access
 
-For graphical remote desktop, use [Remmina](https://remmina.org/).
-
----
+For graphical remote desktop, use [Remmina](https://remmina.org/) or any other dedicated tool.
 
 ## Adding SSH Host Key Fingerprint
+
+When recreating virtual machines with new IP addresses, always remove old SSH host keys using `ssh-keygen -R`. This practice:
+- Prevents "host key changed" warnings that could mask genuine security threats
+- Mitigates risks from IP address reuse in cloud environments (common with ephemeral instances)
+- Maintains a clean `known_hosts` file by eliminating obsolete entries
 
 **Remove old key:**
 ```sh
