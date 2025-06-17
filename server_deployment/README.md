@@ -145,12 +145,12 @@ ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.ym
 
 **SSH to your VM:**
 ```sh
-ssh -i /path_to/cloud_provider/vm_private_key.pem user@198.51.100.1
+ssh -i /path_to/cloud_provider/vm_private_key.pem user@192.0.2.0
 ```
 
 **Copy files to your VM:**
 ```sh
-scp /path_to/file username@198.51.100.1:/path/to/destination
+scp /path_to/file username@192.0.2.0:/path/to/destination
 ```
 
 ---
@@ -194,11 +194,11 @@ When recreating virtual machines with new IP addresses, always remove old SSH ho
 
 **Remove old key:**
 ```sh
-ssh-keygen -R 172.161.000.01
+ssh-keygen -R 192.0.2.1
 ```
 
 **Add new key fingerprint:**
 ```sh
-ssh adminuser@172.161.000.02
+ssh adminuser@192.0.2.2
 # When prompted, accept the fingerprint with 'yes'
 ```
