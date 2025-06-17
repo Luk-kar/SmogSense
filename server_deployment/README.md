@@ -1,8 +1,14 @@
 # SmogSense Deployment and Management Guide
 
-This guide provides a concise overview for setting up, deploying, and managing the SmogSense project using Terraform and Ansible. It is designed to streamline infrastructure provisioning and application deployment.
+This guide provides a concise overview for setting up, deploying, and managing the SmogSense project using [Terraform](https://developer.hashicorp.com/terraform) and [Ansible](https://docs.ansible.com/). It is designed to streamline infrastructure provisioning and application deployment.
 
+- **Terraform** provisions the underlying cloud infrastructure, creating the servers and network resources required for SmogSense.
+- **Ansible** connects to these servers to configure them, install necessary software, and deploy the application, ensuring a fully automated and reproducible deployment pipeline.
 
+The public access for the dashboard is:
+```
+<public_ip>:8090
+```
 ## Environment Setup
 
 Load environment variables for deployment:

@@ -143,3 +143,6 @@ server_deployment/terraform/*/.terraform/
 server_deployment/terraform/*/terraform.tfvars
 server_deployment/terraform/*/*.pem
 server_deployment/terraform/*/*.key
+
+# Temp documentation
+README.md.old
