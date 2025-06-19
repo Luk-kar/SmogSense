@@ -1,8 +1,8 @@
 # 🌫️🔧 SmogSense
 
-A modular `data platform` integrating for `end-to-end analytics`, `data pipelines` orchestration, `machine learning models registry` and ob`servability in local open-source environments.<br>
+A modular `data platform` integrating for `end-to-end analytics`, `data pipelines` orchestration, `machine learning models registry` and observability in local open-source environments.<br>
 
-The example setup for the commercial cloud is here: [./server_deployment/README](./server_deployment/README)
+The example setup for the commercial cloud is here:<br>[./server_deployment/README](./server_deployment/README)
 
 Each service is deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`docker`](https://www.docker.com/):
 
@@ -49,10 +49,10 @@ Each service is deployed via <img src="doc/images/logo/docker_logo.png" alt="Doc
 
 <img src="doc/images/usage/system_collage.png" alt="System architecture collage" />
 
-*e.g. of the most impoertant services:<br>dagster, superset, pgadmin, minio, mlflow, jupyterlab:*
+*e.g. of the most important services:<br>dagster, superset, pgadmin, minio, mlflow, jupyterlab:*
 
 ---
-For cloud deployments, the system is provisioned and configured using <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> Terraform (`infrastructure as code`) and <img src="doc/images/logo/ansible_logo.svg" alt="terraform logo" width="20"/> Ansible (`configuration management automation`) to automate virtual machine setup, service installation, and network security on <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> `Azure`.
+For cloud deployments, the system is provisioned and configured using <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> Terraform (`infrastructure as code`) and <img src="doc/images/logo/ansible_logo.svg" alt="terraform logo" width="20"/> Ansible (`configuration management automation`) to automate virtual machine setup, service installation, and network security on <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> `Azure` cloud.
 
 While the project is intended to run as a proof of concept on a single machine, services can be distributed across multiple machines by adapting the implementation to use <img src="doc/images/logo/docker_swarm_logo.png" alt="Docker Swarm logo" width="20"/> `Docker Swarm` or <img src="doc/images/logo/kubernetes_logo.png" alt="Kubernetes logo" width="20"/> `Kubernetes`.
 
@@ -66,56 +66,56 @@ For services deployment:
 For cloud deployment:
 - <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> `Terraform`
 - <img src="doc/images/logo/ansible_logo.svg" alt="terraform logo" width="20"/>  `Ansible`
-- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> `Azure` account or any other provider
+- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> `Azure` *(account or any other provider)*
 
 Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> Ubuntu <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> Linux
 
 ## ⚙️🔨 Installation and Usage
 
-For local use:<br>
-1. **Clone the repository**
-    ```bash
-    git clone hhttps://github.com/Luk-kar/SmogSense.git
-    cd SmogSense
-    ```
+**A.** For 🖥️ local use:<br>
+   1. **Clone the repository**
+       ```bash
+       git clone hhttps://github.com/Luk-kar/SmogSense.git
+       cd SmogSense
+       ```
 
-2. **Configure environment variables**  
-   Copy the example file and edit it with your credentials and model settings: 
-   ```bash
-   cp .env.example .env
-   # Open .env in your editor and adjust passwords, users or ports etc.
-   ```
-3. **Start services with Docker Compose**  
-   ```bash
-   docker-compose up --build -d
-   ```
-   - **PostgreSQL** will initialize the specified databases.
-   - **pgAdmin** will be available for database management.
-   - **MinIO** will serve as S3-compatible object storage.
-   - **Superset** will be available for data visualization.
-   - **JupyterLab** will be available for interactive notebooks.
-   - **MLflow** will be available for model management.
-   - **Redis** will be available for caching and queues.
-   - **Dagster** will orchestrate data pipelines.
-   - **Monitoring stack** (Prometheus, Grafana, Loki, Alertmanager, Promtail, cAdvisor, Node Exporter, Pushgateway, Caddy) will be available for observability.
-   - **(Optional) Mattermost** will be available for team collaboration.
-4. **Verify everything is running**  
-   ```bash
-   docker ps
-   # You should see:
-    # smogsense_postgres, smogsense_pgadmin, smogsense_minio... etc
-   ```
+   2. **Configure environment variables**  
+      Copy the example file and edit it with your credentials and model settings: 
+      ```bash
+      cp .env.example .env
+      # Open .env in your editor and adjust passwords, users or ports etc.
+      ```
+   3. **Start services with Docker Compose**  
+      ```bash
+      docker-compose up --build -d
+      ```
+      - **PostgreSQL** will initialize the specified databases.
+      - **pgAdmin** will be available for database management.
+      - **MinIO** will serve as S3-compatible object storage.
+      - **Superset** will be available for data visualization.
+      - **JupyterLab** will be available for interactive notebooks.
+      - **MLflow** will be available for model management.
+      - **Redis** will be available for caching and queues.
+      - **Dagster** will orchestrate data pipelines.
+      - **Monitoring stack** (Prometheus, Grafana, Loki, Alertmanager, Promtail, cAdvisor, Node Exporter, Pushgateway, Caddy) will be available for observability.
+      - **(Optional) Mattermost** will be available for team collaboration.
+   4. **Verify everything is running**  
+      ```bash
+      docker ps
+      # You should see:
+       # smogsense_postgres, smogsense_pgadmin, smogsense_minio... etc
+      ```
 
-5. **Access the application**  
-   Open your browser and navigate to  <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="20"/> `Dagster` webserver:  
-   ```
-   http://localhost:5000
-   ```
-    And run the example tasks:
-    - `upload_example_project_data_to_minio`
-    - `restore_example_project_database`
+   5. **Access the application**  
+      Open your browser and navigate to  <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="20"/> `Dagster` webserver:  
+      ```
+      http://localhost:5000
+      ```
+       And run the example tasks:
+       - `upload_example_project_data_to_minio`
+       - `restore_example_project_database`
 
-For ☁️ cloud use follow:<br>
+**B.** For ☁️ cloud use:<br>
 [server_deployment/README.md](server_deployment/README.md)
 
 ## <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="25"/> Data Pipeline
