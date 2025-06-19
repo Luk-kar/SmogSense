@@ -1,0 +1,28 @@
+### Pipelines services  
+Dagster orchestrates domain-specific data pipelines through isolated gRPC servers:  
+- **Air Quality Pipeline**  
+  Processes GIOS API data via port `4000`  
+- **Health Pipeline**  
+  Handles statistical health data via port `4001`  
+- **Social Media Pipeline**  
+  Manages Twitter/X data extraction via port `4002`  
+- **Warehouse Pipeline**  
+  Executes data warehousing tasks via port `4003`  
+- **Territory Pipeline**  
+  Processes geospatial data via port `4004`  
+- **Models Deployment**  
+  Manages ML model deployment via port `4005`  
+
+**Orchestration components**:  
+- **Dagster Webserver** (Port `5000`)  
+  UI for pipeline management and visualization  
+- **Dagster Daemon**  
+  Background process for job scheduling and execution  
+
+All pipelines share a common architecture:  
+1. **Isolated containers** with dedicated resources  
+2. **Port-based communication** for gRPC servers  
+3. **Shared dependencies** (PostgreSQL, MinIO)  
+4. **Health monitoring** via port connectivity checks  
+
+The modular design allows independent updates to pipelines without disrupting others.

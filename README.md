@@ -57,7 +57,6 @@ For cloud deployments, the system is provisioned and configured using <img src="
 While the project is intended to run as a proof of concept on a single machine, services can be distributed across multiple machines by adapting the implementation to use <img src="doc/images/logo/docker_swarm_logo.png" alt="Docker Swarm logo" width="20"/> `Docker Swarm` or <img src="doc/images/logo/kubernetes_logo.png" alt="Kubernetes logo" width="20"/> `Kubernetes`.
 
 
-
 ## 📦 Requirements
 
 For services deployment:
@@ -119,6 +118,28 @@ Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ub
 [server_deployment/README.md](server_deployment/README.md)
 
 ## <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="25"/> Data Pipeline
+
+### 🌐 Data Sources
+
+- **GIOS API:** Air quality data (stations, measurements, air quality index)
+- **Statistical API (GUS BDL):** Health and demographic statistics
+- **Custom JSON endpoint:** Geospatial data for provinces
+- **Twitter (X) API:** Social media data (limited by rate and access policies)
+  
+### 🔄 Pipelines services
+
+![data flow](./doc/images/dagster_pipelines/data_flow.png)
+
+### ✅ Tests
+
+Most assets include automated tests and Dagster checks that execute after each task completes, ensuring data quality and pipeline reliability.
+
+For examples, see the validation logic in:  
+**[air_quality/assets/annual_statistics/validations](src/orchestration/dagster/my_project/air_quality/assets/annual_statistics/validations)**
+
+### 🏗️ Dagster project setup
+
+[**README**](src/orchestration/dagster/README)
 
 ## 🔧 Configuration
 
