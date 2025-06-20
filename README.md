@@ -189,11 +189,22 @@ Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins logo" width="
 
 **Example Workflow:**
 
-1. **Code Commit:** Developer pushes changes to the repository.
-2. **Trigger Build:** Jenkins detects the change and checks out the latest code.
-3. **Run Tests:** Jenkins executes automated tests for the data pipelines.
-4. **Report Results:** Test results and logs are displayed and archived.
-5. **Deploy:** If tests pass, Jenkins can automatically deploy updated pipelines to development or production environments.
+1. **Code Commit:**  
+   Developer pushes changes to the repository.
+
+2. **Trigger Build:**  
+   Jenkins detects the change and checks out the latest code.
+
+3. **Run Tests:**  
+   Jenkins executes automated tests for the data pipelines.  
+   *All tests are run against dedicated development data environments (such as development MinIO and PostgreSQL instances) to ensure that production data is not affected and changes are validated safely.*
+
+4. **Report Results:**  
+   Test results and logs are displayed and archived.
+
+5. **Deploy:**  
+   If tests pass, Jenkins can automatically deploy updated pipelines to development or production environments.  
+   *When deploying to development, Jenkins continues to use development data environments. When deploying to production, only tested and approved pipelines are moved to production data environments.*
 
 ## 📜 License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
