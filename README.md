@@ -205,6 +205,9 @@ Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins logo" width="
 5. **Deploy:**  
    If tests pass, Jenkins can automatically deploy updated pipelines to development or production environments.  
    *When deploying to development, Jenkins continues to use development data environments. When deploying to production, only tested and approved pipelines are moved to production data environments.*
+---
+
+This approach ensures that every test and deployment stage uses the correct data environment, minimizing risk and mirroring production as closely as possible for validation.
 
 ## 📜 License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
