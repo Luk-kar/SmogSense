@@ -179,7 +179,16 @@ tests/run_tests_data_air_quality.sh
 ```
 ## 💡 Notes
 
-TODO
+During the project, I discovered that implementing a **mapping table** is significantly more efficient than repeatedly dropping and recreating tables to unify schemas from disparate data sources. This approach involves creating a dedicated table that indexes foreign keys from source tables while storing unified values separately.
+
+**Key advantages:**
+- **Schema Preservation:** Maintains original source table structures for easier debugging
+- **Data Integrity:** Avoids destructive operations on source data
+- **Maintainability:** Simplifies schema evolution when working with external data sources
+- **Performance:** Redundant tables can be incrementally updated without redefining foreign key relationships
+
+This pattern proves particularly valuable in ETL pipelines where source schemas may change independently.
+
 
 ## 🧩 Possible Further Development
 
