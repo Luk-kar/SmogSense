@@ -1,12 +1,12 @@
-## Project Overview
+## 🌫️ Project Overview
 
-**A unified data processing pipeline** for air quality, health, social media, and geospatial data using Dagster orchestration. The solution integrates multi-source environmental data, applies validation and transformation, and delivers structured outputs for analysis through these capabilities:
+**A unified data processing pipeline** for air quality, health, social media, and geospatial data using Dagster orchestration. The solution integrates multi-source environmental data, applies validation and transformation, and delivers structured outputs for analysis with these capabilities:
 
 - **End-to-end ETL workflow** with validation, transformation, and storage
 - **Unified data integration** from environmental, health, social, and spatial sources
 - **Scalable architecture** supporting continuous data processing
-- 
-### Key Features
+
+### 🔑 Key Features
 
 - **Multi-source Integration**: Processes air quality (GIOS), health (GUS), social media (Twitter/X), administrative regions, and geospatial data
 - **Automated Orchestration**: Uses `Dagster` for dependency-aware pipeline management
@@ -16,37 +16,38 @@
 - **Validation Framework**: Comprehensive data quality checks at all stages
 - **Containerized Deployment**: Docker-based isolated environments per pipeline component
 
-## Architecture
+## 🏗️ Architecture
 
 ### Core Components
 
-#### Data Sources
-- **Air Quality (GIOS API)**  
+#### 🌐 Data Sources
+- **[Air Quality (GIOS API):](https://powietrze.gios.gov.pl/pjp/content/api?lang=en)**  
   📊 **Annual Statistics**: Historical pollutant measurements  
-  📡 **Sensor Data**: Station data  
+  📡 **Sensor Data**: Station data and real-time readings  
   🗺️ **Map Pollution**: Geographic concentration distributions  
   🔢 **Aggregates**: Daily measurement composites  
   ⚠️ **Air Quality Index**: Health risk assessments  
-- **Health Statistics (GUS API)**  
+- **[Health Statistics (GUS API):](https://stat.gov.pl/en/)**  
   💀 **Causes of Death**: Categorized mortality data  
   👥 **Population Metrics**: Regional demographic statistics  
-- **Social Media (Twitter/X API)**  
+- **[Social Media (Twitter/X API):](https://developer.x.com/en/docs/x-api)**  
   💬 Public sentiment and event-related data  
-- **Administrative/Geospatial Data**  
+- **[Administrative/Geospatial Data:](https://www.gugik.gov.pl/pzgik)**  
   🏞️ Regional boundaries and administrative hierarchies  
+
  
 
 
-#### Processing Workflow
+#### 🔄 Processing Workflow
 1. **Data Acquisition**: API-based raw data collection
 2. **Processing & Validation**: Transformation with quality check
 3. **Data Lake**: Stores intermediate data in MinIO
 4. **Database Upload**: Persists processed data to PostgreSQL
 5. **Data Unification**: Cross-source integration
 
-## Configuration
+## ⚙️ Configuration
 
-### Environment Setup
+### 🔧 Environment Setup
 Managed through `Docker` build arguments and runtime environment variables:
 
 ```bash
@@ -83,34 +84,33 @@ GITHUB_POSTGRES_FILE_NAME=postgres.yaml
 # MLflow Configuration
 MLFLOW_TRACKING_URI=http://mlflow:5000
 ```
-### Dynamic Configuration
+### 🔀 Dynamic Configuration
 
 - **Jinja2 templates** generate Dagster configs from environment variables
 - **Generator Scripts**: 
   - [`dagster_generator.py`](./dagster_generator.py)
-  - [`workspace_generator.py`](./workspace_generator.py)
-  - 
+  - [`workspace_generator.py`](./workspace_generator.py) 
 - **Template Files**:
   - [`dagster.yaml.jinja`](./dagster.yaml.jinja)
   - [`workspace.yaml.jinja`](./workspace.yaml.jinja)
-  - 
-## Data Quality & Validation
+  
+## ✅ Data Quality & Validation
 
 The pipeline includes comprehensive data validation:
 
-### Asset Checks
+### ✔️ Asset Checks
 - **Structural Validation**: Ensures DataFrames match expected schemas
 - **Consistency**: Cross-stage data alignment
 - **Referential Integrity**: Foreign key validation
 - **Completeness**: Mandatory field verification
 
-### Processing Safeguards
+### 🛡️ Processing Safeguards
 - **Null Handling**: Proper treatment of missing values
 - **Type Conversion**: Ensures correct data types
 - **Duplicate Detection**: Identifies and handles duplicate records
 - **Foreign Key Mapping**: Maintains relationships between entities
 
-### Pipelines services  
+### 🔄 Pipelines Services  
 Dagster orchestrates domain pipelines via dedicated isolated [gRPC servers](https://docs.dagster.io/deployment/code-locations/workspace-yaml#running-your-own-grpc-server):
 
 | Pipeline              | Port | Functionality                     |
@@ -134,9 +134,9 @@ Dagster orchestrates domain pipelines via dedicated isolated [gRPC servers](http
 
 The modular design allows independent updates to pipelines without disrupting others.
 
-## Deployment
+## 🚀 Deployment
 
-### Docker Setup
+### 🐳 Docker Setup
 
 The project uses Docker for deployment with separate containers for:
 
@@ -145,55 +145,55 @@ The project uses Docker for deployment with separate containers for:
 - **PostgreSQL**: Primary datastore
 - **MinIO**: Object storage for data lake
 
-## Monitoring & Operations
+## 📊 Monitoring & Operations
 
 - **Real-time Visualization**: Dagster UI for execution tracking
 - **Asset Materialization**: Data state monitoring
 - **Validation Reporting**: Automated quality alerts
 - **Comprehensive Logging**: Debugging and audit trails
 
-## Usage
+## 💻 Usage
 
-### Running the Pipeline
-
-### Pipeline Execution
+### ▶️ Running the Pipeline
 1. Start Docker containers
 2. Access Dagster UI at `localhost:5000`
 3. Select target asset groups
 4. Monitor materialization progress
 5. Review validation reports
 
-### Data Access Points
+### 📂 Data Access Points
 - PostgreSQL direct querying
 - Dagster materialized assets
 - Apache Superset dashboards
 - MinIO object browser
 
-## Development
+## 🔧 Development
 
-### Adding New Data Sources
-
-### Adding Data Sources
+**➕ Adding New Data Sources:**
 1. Create module in `src/orchestration/dagster/my_project/` (e.g., `weather`)
 2. Implement acquisition in `src/data_acquisition/`
 3. Add transformation/validation logic
 4. Define database models (if new entities)
 5. Implement asset checks
 
-**Dagster Component Relationships**:
-- **Assets** (`@asset`): Functions that produce data objects (tables/files/models) and define dependencies
-- **Assets Checks**: Validation rules attached to assets that verify data quality after materialization (e.g., schema compliance, null checks)
-- **Resources**: Shared clients for external services (DBs, APIs) configured at runtime
-- **Jobs**: Executable units that run selections of assets, triggered manually or automatically
-- **Schedules**: Automation rules that trigger job executions at specified intervals (e.g., cron)
+**🧩 Dagster Component Relationships**:
+- **[Code Location](https://docs.dagster.io/concepts/repositories-workspaces/workspaces)**: Container for organizing related assets, resources, and jobs into deployable units
+- **[Assets](https://docs.dagster.io/concepts/assets)** (`@asset`): Functions that produce data objects (tables/files/models) and define dependencies
+- **[Asset Checks](https://docs.dagster.io/concepts/asset-checks)**: Validation rules attached to assets that verify data quality after materialization (e.g., schema compliance, null checks)
+- **[Resources](https://docs.dagster.io/concepts/resources)**: Shared clients for external services (DBs, APIs) configured at runtime
+- **[Jobs](https://docs.dagster.io/concepts/jobs)**: Executable units that run selections of assets, triggered manually or automatically
+- **[Schedules](https://docs.dagster.io/concepts/schedules-sensors/schedules)**: Automation rules that trigger job executions at specified intervals (e.g., cron)
 
-**Workflow**: 
-1. Assets depend on resources → 
-2. Jobs group assets and checks → 
-3. Schedules trigger jobs → 
-4. Runs execute pipelines and validate outputs
+**⏭️ Workflow**: 
+1. Code Location organizes assets/resources →  
+2. Assets depend on resources →  
+3. Jobs group assets and checks →  
+4. Schedules trigger jobs →  
+5. Runs execute pipelines and validate outputs
+
 ---
 
+**📚 Official Documentation**:
 For more information, refer to the official documentation:
 - [Dagster Documentation](https://docs.dagster.io/) - Orchestration framework
 - [MinIO Documentation](https://min.io/docs/) - Object storage system
