@@ -1,10 +1,15 @@
 # 🌫️🔧 SmogSense
 
-A modular `data platform` integrating for `end-to-end analytics`, `data pipelines` orchestration, `machine learning models registry` and observability in local open-source environments.<br>
+A modular `data platform` for `end-to-end analytics`, `data pipeline orchestration`, `machine learning model registry`, and observability in local open-source environments.
 
-The example setup for the commercial cloud is here:<br>[*./server_deployment/README*](./server_deployment/README)
+**Cloud Deployment Example:**  
+See [*./server_deployment/README*](./server_deployment/README) for commercial cloud setup.
 
-Each service is deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`docker`](https://www.docker.com/):
+---
+
+## 🛠️ Service Deployment
+Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`Docker`](https://www.docker.com/):
+
 
 **📊 Analytics:**
 - <img src="doc/images/logo/postgres_logo.png" alt="pgAdmin logo" width="20"/> [pgAdmin:](https://www.pgadmin.org)<br>*PostgreSQL database web management tool.*<br>[*`http://localhost:5050`*](http://localhost:5050)
@@ -46,32 +51,44 @@ Each service is deployed via <img src="doc/images/logo/docker_logo.png" alt="Doc
 - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost logo" width="20"/> [Mattermost:](https://mattermost.com/)<br>*Team chat and collaboration platform.*<br>[*`http://localhost:8065`*](http://localhost:8065)
 
 ---
-*data platform:*
+
+## 📸 System Overview
+**Data Platform Architecture:**  
 <img src="doc/images/usage/system_collage.png" alt="System architecture collage" />
 
-*resources monitoring:*
+**Resource Monitoring:**  
+<img src="doc/images/usage/monitoring/Grafana_Monitoring.png" alt="Grafana monitoring dashboard" />
 
-<img src="doc/images/usage/monitoring/Grafana_Monitoring.png" alt="System architecture collage" />
-
-*e.g. of the most important services:<br>dagster, superset, pgadmin, minio, mlflow, jupyterlab:*
+**Key Services:**  
+Dagster, Superset, pgAdmin, MinIO, MLflow, JupyterLab
 
 ---
-For cloud deployments, the system is provisioned and configured using <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> Terraform (`infrastructure as code`) and <img src="doc/images/logo/ansible_logo.svg" alt="terraform logo" width="20"/> Ansible (`configuration management automation`) to automate virtual machine setup, service installation, and network security on <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> `Azure` cloud.
+## ☁️ Cloud Deployment
+For cloud deployments, provisioning uses:
+- <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [**Terraform**](https://www.terraform.io/)  
+  Infrastructure as code
+- <img src="doc/images/logo/ansible_logo.svg" alt="ansible logo" width="20"/> [**Ansible**](https://www.ansible.com/)  
+  Configuration management automation
+- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [**Azure**](https://azure.microsoft.com/)  
+  Cloud provider
 
-While the project is intended to run as a proof of concept on a single machine, services can be distributed across multiple machines by adapting the implementation to use <img src="doc/images/logo/docker_swarm_logo.png" alt="Docker Swarm logo" width="20"/> `Docker Swarm` or <img src="doc/images/logo/kubernetes_logo.png" alt="Kubernetes logo" width="20"/> `Kubernetes`.
+**Scalability:**  
+While designed for single-machine Proof of Concept, services can be distributed using:
+- <img src="doc/images/logo/docker_swarm_logo.png" alt="Docker Swarm logo" width="20"/> `Docker Swarm`
+- <img src="doc/images/logo/kubernetes_logo.png" alt="Kubernetes logo" width="20"/> `Kubernetes`
 
 
 ## 📦 Requirements
+**For Services Deployment:**
+- <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`docker-compose.yml`](docker-compose.yml)
 
-For services deployment:
-- <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/>  [`docker-compose.yml`](docker-compose.yml)
-  
-For cloud deployment:
+**For Cloud Deployment:**
 - <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [`Terraform`](https://www.terraform.io/)
-- <img src="doc/images/logo/ansible_logo.svg" alt="terraform logo" width="20"/>  [`Ansible`](https://www.ansible.com/)
-- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [`Azure` ](https://azure.microsoft.com/)*(or any other provider)*
+- <img src="doc/images/logo/ansible_logo.svg" alt="ansible logo" width="20"/> [`Ansible`](https://www.ansible.com/)
+- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [`Azure`](https://azure.microsoft.com/) (or alternative provider)
 
-Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> [`Ubuntu`](https://ubuntu.com/) <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> [`Linux`](https://www.youtube.com/watch?v=rrB13utjYV4)
+**Tested Environment:**  
+<img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> [`Ubuntu`](https://ubuntu.com/) <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> [`Linux`](https://www.youtube.com/watch?v=rrB13utjYV4)
 
 ## ⚙️🔨 Installation and Usage
 
@@ -83,7 +100,7 @@ Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ub
        ```
 
    2. **Configure environment variables**  
-      Copy the example file and edit it with your credentials and model settings: 
+
       ```bash
       cp .env.example .env
       # Open .env in your editor and adjust passwords, users or ports etc.
@@ -92,23 +109,20 @@ Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ub
       ```bash
       docker-compose up --build -d
       ```
-  - <img src="doc/images/logo/postgres_logo.png" alt="PostgreSQL logo" width="20"/> **PostgreSQL** will initialize the specified databases.
-  - <img src="doc/images/logo/postgres_logo.png" alt="pgAdmin logo" width="20"/> **pgAdmin** will be available for database management.
-  - <img src="doc/images/logo/MINIO_logo.png" alt="MinIO logo" width="20"/> **MinIO** will serve as S3-compatible object storage.
-  - <img src="doc/images/logo/superset_logo.png" alt="Superset logo" width="20"/> **Superset** will be available for data visualization.
-  - <img src="doc/images/logo/jupyterlab_logo.png" alt="JupyterLab logo" width="20"/> **JupyterLab** will be available for interactive notebooks.
-  - <img src="doc/images/logo/mlflow_logo.svg" alt="MLflow logo" width="20"/> **MLflow** will be available for model management.
-  - <img src="doc/images/logo/redis_logo.png" alt="Redis logo" width="20"/> **Redis** will be available for caching and queues.
-  - <img src="doc/images/logo/dagster_logo.png" alt="Dagster logo" width="20"/> **Dagster** will orchestrate data pipelines.
-  - <img src="doc/images/logo/grafana_logo.png" alt="Grafana logo" width="20"/> <img src="doc/images/logo/prometheus_logo.png" alt="Prometheus logo" width="20"/> <img src="doc/images/logo/loki_logo.png" alt="Loki logo" width="20"/> <img src="doc/images/logo/alert_manager_logo.png" alt="Alertmanager logo" width="20"/> <img src="doc/images/logo/prometheus_logo.png" alt="Promtail logo" width="20"/> **Monitoring stack** (Prometheus, Grafana, Loki, Alertmanager, Promtail, cAdvisor, Node Exporter, Pushgateway, Caddy) will be available for observability.
-  - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost logo" width="20"/> **(Optional) Mattermost** will be available for team collaboration.
+
+      **Initialized Services:**
+      - <img src="doc/images/logo/postgres_logo.png" alt="PostgreSQL" width="20"/> PostgreSQL databases
+      - <img src="doc/images/logo/postgres_logo.png" alt="pgAdmin" width="20"/> pgAdmin management
+      - <img src="doc/images/logo/MINIO_logo.png" alt="MinIO" width="20"/> MinIO object storage
+      - <img src="doc/images/logo/superset_logo.png" alt="Superset" width="20"/> Superset visualization
+      - <img src="doc/images/logo/jupyterlab_logo.png" alt="JupyterLab" width="20"/> JupyterLab notebooks
+      - <img src="doc/images/logo/mlflow_logo.svg" alt="MLflow" width="20"/> MLflow model tracking
+      - <img src="doc/images/logo/redis_logo.png" alt="Redis" width="20"/> Redis caching
+      - <img src="doc/images/logo/dagster_logo.png" alt="Dagster" width="20"/> Dagster orchestration
+      - Monitoring stack (Grafana, Prometheus, Loki, etc.)
+      - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost" width="20"/> Mattermost collaboration
 
       ---
-      
-      Not all services have to be run at once, for example to run only dagster warehouse pipeline you run:
-      ```
-      docker compose up dagster_code_warehouse dagster_daemon dagster_webserver
-      ```
 
    4. **Verify everything is running**  
       ```bash
@@ -118,13 +132,14 @@ Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ub
       ```
 
    5. **Access the application**  
-      Open your browser and navigate to  <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="20"/> `Dagster` webserver:  
+      Open <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="20"/> `Dagster` at:  
       http://localhost:5000
 
-       And run the example tasks:
+       **Run example tasks:** 
        - `upload_example_project_data_to_minio`
        - `restore_example_project_database`
-   6. **Watch if all services went well, look at assets log if didn't**
+   6. **Troubleshooting**<br>
+   Check asset logs for service issues
   
    7. **Stop all services**
       ```bash
@@ -134,93 +149,85 @@ Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ub
       ```bash
       docker compose down
       ```
-  **B.** For ☁️ cloud use:<br>
-  [server_deployment/README.md](server_deployment/README.md)
+### ☁️ Cloud Deployment
+See [server_deployment/**README.md**](server_deployment/README.md)
 
-## <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="25"/> Data Pipeline
-
+## <img src="doc/images/logo/dagster_logo.png" alt="Dagster" width="25"/> Data Pipeline
 ### 🌐 Data Sources
-
-- [**GIOS API:**]((https://powietrze.gios.gov.pl/pjp/content/api)) Air quality data (stations, measurements, air quality index)
-- [**Statistical API (GUS BDL):**]((https://bdl.stat.gov.pl/bdl/start)) Health and demographic statistics
-- [**Custom JSON endpoint:**](https://gist.githubusercontent.com/Luk-kar/3aefd3f77d288ada85b5f44422b711d8/raw/b0793391ab0478e0d92052d204e7af493a7ecc92/poland_woj.json) Geospatial data for provinces
-- [**Twitter (X) API:**](https://twikit.readthedocs.io/en/latest/twikit.html) Social media data (limited by rate and access policies)
+- [**GIOS API**](https://powietrze.gios.gov.pl/pjp/content/api)  
+Air quality data (stations, measurements, AQI)
+- [**Statistical API (GUS BDL)**](https://bdl.stat.gov.pl/bdl/start)  
+Health and demographic statistics
+- [**Custom JSON Endpoint**](https://gist.githubusercontent.com/Luk-kar/3aefd3f77d288ada85b5f44422b711d8/raw/b0793391ab0478e0d92052d204e7af493a7ecc92/poland_woj.json)  
+Geospatial province data
+- [**Twitter (X) API**](https://twikit.readthedocs.io/en/latest/twikit.html)  
+Social media data (rate-limited)
   
-### 🔄 Pipelines services
+### 🔄 Pipeline Architecture
 
 ![data flow](./doc/images/dagster_pipelines/data_flow.png)
 
-### ✅ Tests
+### ✅ Data Quality
 
-Most assets include automated tests. The Dagster's [checks](https://dagster.io/blog/dagster-asset-checks) that execute after each task completes, ensuring data quality and pipeline reliability.
+Assets include automated [Dagster checks](https://dagster.io/blog/dagster-asset-checks) for validation.  
 
-For examples, see the validation logic in:  
-**[air_quality/assets/annual_statistics/validations](src/orchestration/dagster/my_project/air_quality/assets/annual_statistics/validations)**
+**Example validation logic:**  
+[air_quality/assets/annual_statistics/validations](src/orchestration/dagster/my_project/air_quality/assets/annual_statistics/validations)
 
 ### 🏗️ Dagster services setup
 
-[**README**](src/orchestration/dagster/README)
+See [**README**](src/orchestration/dagster/README)
 
 ## 🔧 Configuration
 
-All settings are loaded from the [`.env`](.env.example) file, which contains environment variables organized by service.<br><br>⚠️ **Important security considerations**:
-- **Production warning**: Avoid storing sensitive data in environment variables. Use a dedicated secrets management system instead.
-- **Security tags**:
-  - `#SECRECTS`: Variables requiring secure handling (passwords, API keys)
+**Security Notes:**  
+- ⚠️ **Avoid storing secrets in .env for production** - use dedicated secrets management
+- **Security tags in .env:**
+  - `#SECRETS`: Passwords/API keys requiring secure handling
   - `#WARNING`: Critical configuration needing attention
 
 ## ✅ Testing
-Testing is automated using shell scripts and Python modules, with dedicated test suites for data acquisition features such as `air quality` and `health data`. 
-
-Test files are organized by functionality, and you can run all tests at once or target specific modules using the provided scripts.
+Automated tests for data acquisition features: 
 
 ```sh
 tests/run_tests_data_air_quality.sh
 ```
-## 💡 Notes
+or
+```sh
+tests/run_tests_all.sh
+```
+## 💡 Architectural Insight
+1. Implementing a **mapping table** is more efficient than repeatedly dropping/recreating tables to unify schemas from disparate sources.
 
-During the project, I discovered that implementing a **mapping table** is significantly more efficient than repeatedly dropping and recreating tables to unify schemas from disparate data sources. This approach involves creating a dedicated table that indexes foreign keys from source tables while storing unified values separately.
+   **Advantages:**
+   - **Schema Preservation:** Maintains original source structures
+   - **Data Integrity:** Avoids destructive operations
+   - **Maintainability:** Simplifies schema evolution
+   - **Performance:** Enables incremental updates without redefining foreign keys
 
-**Key advantages:**
-- **Schema Preservation:** Maintains original source table structures for easier debugging
-- **Data Integrity:** Avoids destructive operations on source data
-- **Maintainability:** Simplifies schema evolution when working with external data sources
-- **Performance:** Redundant tables can be incrementally updated without redefining foreign key relationships
+   This pattern is particularly valuable in ETL pipelines with independently changing source schemas.
 
-This pattern proves particularly valuable in ETL pipelines where source schemas may change independently.
+2. Superset dashboard exports may encounter compatibility issues when imported on different machines.
 
+## 🧩 Further Possible Development
+### Jenkins Integration
+Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins" width="15"/> [Jenkins](https://www.jenkins.io/) for CI/CD automation.
 
-## 🧩 Possible Further Development
+**Workflow:**
+1. **Code Commit:** Changes pushed to repo
+2. **Build Trigger:** Jenkins detects changes
+3. **Test Execution:**  
+   *Uses development data environments (MinIO/PostgreSQL) to protect production data*
+4. **Result Reporting:** Archived logs and reports
+5. **Deployment:**  
+   *Development: Uses dev data environments  
+   Production: Moves tested pipelines to production*
 
-Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins logo" width="15"/> [Jenkins](https://www.jenkins.io/) to automate the building, testing, and deployment of data pipelines as part of a CI/CD (Continuous Integration and Continuous Deployment) workflow.
-
-**Key Benefits and Features:**
-
-- **Automated Testing:** Jenkins can automatically trigger test suites whenever code changes are committed, ensuring consistent and rapid feedback on pipeline quality.
-- **Pipeline Orchestration:** Define complex workflows using Jenkins Pipelines (written as code in a `Jenkinsfile`), enabling repeatable and version-controlled automation of build, test, and deployment steps.
-- **Reporting and Notifications:** Generate detailed test reports, visualize trends, and send alerts (via email, Mattermost/Slack, etc.) for build or test failures.
-- **Integration Flexibility:** Leverage thousands of plugins to connect with source control (GitHub, Bitbucket), testing frameworks (unittest, pytest), containerization tools (Docker, Kubernetes), and collaboration platforms.
-
-**Example Workflow:**
-
-1. **Code Commit:**  
-   Developer pushes changes to the repository.
-
-2. **Trigger Build:**  
-   Jenkins detects the change and checks out the latest code.
-
-3. **Run Tests:**  
-   Jenkins executes automated tests for the data pipelines.  
-   *All tests are run against dedicated development data environments (such as development MinIO and PostgreSQL instances) to ensure that production data is not affected and changes are validated safely.*
-
-4. **Report Results:**  
-   Test results and logs are displayed and archived.
-
-5. **Deploy:**  
-   If tests pass, Jenkins can automatically deploy updated pipelines to development or production environments.  
----
-
-This approach ensures that every test and deployment stage uses the correct data environment, minimizing risk of loosing data and mirroring production as closely as possible for validation.
+**Benefits:**
+- Automated testing on commit
+- Pipeline-as-code via `Jenkinsfile`
+- Build/test reporting and alerts
+- Plugin ecosystem integration
 
 ## 📜 License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+MIT License - See [LICENSE](LICENSE)
