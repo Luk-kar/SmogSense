@@ -46,8 +46,12 @@ Each service is deployed via <img src="doc/images/logo/docker_logo.png" alt="Doc
 - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost logo" width="20"/> [Mattermost:](https://mattermost.com/)<br>*Team chat and collaboration platform.*<br>[*`http://localhost:8065`*](http://localhost:8065)
 
 ---
-
+*data platform:*
 <img src="doc/images/usage/system_collage.png" alt="System architecture collage" />
+
+*resources monitoring:*
+
+<img src="doc/images/usage/monitoring/Grafana_Monitoring.png" alt="System architecture collage" />
 
 *e.g. of the most important services:<br>dagster, superset, pgadmin, minio, mlflow, jupyterlab:*
 
