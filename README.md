@@ -2,7 +2,7 @@
 
 A modular `data platform` integrating for `end-to-end analytics`, `data pipelines` orchestration, `machine learning models registry` and observability in local open-source environments.<br>
 
-The example setup for the commercial cloud is here:<br>[./server_deployment/README](./server_deployment/README)
+The example setup for the commercial cloud is here:<br>[*./server_deployment/README*](./server_deployment/README)
 
 Each service is deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`docker`](https://www.docker.com/):
 
@@ -16,7 +16,7 @@ Each service is deployed via <img src="doc/images/logo/docker_logo.png" alt="Doc
 
 
 **📈 Monitoring Resources:**<br>
-*[Documentation](https://github.com/Luk-kar/dockprom-and-logs)*
+*[Documentation.](https://github.com/Luk-kar/dockprom-and-logs)*
 - <img src="doc/images/logo/grafana_logo.png" alt="Grafana logo" width="20"/> [Grafana:](https://grafana.com/)<br>*Visualize metrics and build dashboards.*<br>[*`http://localhost:3000`*](http://localhost:3000)
 
 - <img src="doc/images/logo/prometheus_logo.png" alt="Prometheus logo" width="20"/> [Prometheus:](https://prometheus.io/)<br>*Metrics collection and time-series storage.*<br>
@@ -67,15 +67,15 @@ For services deployment:
 - <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/>  [`docker-compose.yml`](docker-compose.yml)
   
 For cloud deployment:
-- <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> `Terraform`
-- <img src="doc/images/logo/ansible_logo.svg" alt="terraform logo" width="20"/>  `Ansible`
-- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> `Azure` *(account or any other provider)*
+- <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [`Terraform`](https://www.terraform.io/)
+- <img src="doc/images/logo/ansible_logo.svg" alt="terraform logo" width="20"/>  [`Ansible`](https://www.ansible.com/)
+- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [`Azure` ](https://azure.microsoft.com/)*(or any other provider)*
 
 Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> [`Ubuntu`](https://ubuntu.com/) <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> [`Linux`](https://www.youtube.com/watch?v=rrB13utjYV4)
 
 ## ⚙️🔨 Installation and Usage
 
-**A.** For 🖥️ local use:<br>
+   **A.** For 🖥️ local use:<br>
    1. **Clone the repository**
        ```bash
        git clone hhttps://github.com/Luk-kar/SmogSense.git
@@ -119,22 +119,23 @@ Project's scripts were run on <img src="doc/images/logo/ubuntu_logo.svg" alt="Ub
 
    5. **Access the application**  
       Open your browser and navigate to  <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="20"/> `Dagster` webserver:  
-      ```
       http://localhost:5000
-      ```
+
        And run the example tasks:
        - `upload_example_project_data_to_minio`
        - `restore_example_project_database`
-   6. **Stop all services**
+   6. **Watch if all services went well, look at assets log if didn't**
+  
+   7. **Stop all services**
       ```bash
       docker compose stop
       ```
-   7. **Remove all services from the machine**
+   8. **Remove all services from the machine**
       ```bash
       docker compose down
       ```
-      **B.** For ☁️ cloud use:<br>
-      [server_deployment/README.md](server_deployment/README.md)
+  **B.** For ☁️ cloud use:<br>
+  [server_deployment/README.md](server_deployment/README.md)
 
 ## <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="25"/> Data Pipeline
 
@@ -189,7 +190,7 @@ Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins logo" width="
 - **Automated Testing:** Jenkins can automatically trigger test suites whenever code changes are committed, ensuring consistent and rapid feedback on pipeline quality.
 - **Pipeline Orchestration:** Define complex workflows using Jenkins Pipelines (written as code in a `Jenkinsfile`), enabling repeatable and version-controlled automation of build, test, and deployment steps.
 - **Reporting and Notifications:** Generate detailed test reports, visualize trends, and send alerts (via email, Mattermost/Slack, etc.) for build or test failures.
-- **Integration Flexibility:** Leverage thousands of plugins to connect with source control (GitHub, Bitbucket), testing frameworks (unittest), containerization tools (Docker, Kubernetes), and collaboration platforms.
+- **Integration Flexibility:** Leverage thousands of plugins to connect with source control (GitHub, Bitbucket), testing frameworks (unittest, pytest), containerization tools (Docker, Kubernetes), and collaboration platforms.
 
 **Example Workflow:**
 
@@ -208,10 +209,9 @@ Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins logo" width="
 
 5. **Deploy:**  
    If tests pass, Jenkins can automatically deploy updated pipelines to development or production environments.  
-   *When deploying to development, Jenkins continues to use development data environments. When deploying to production, only tested and approved pipelines are moved to production data environments.*
 ---
 
-This approach ensures that every test and deployment stage uses the correct data environment, minimizing risk and mirroring production as closely as possible for validation.
+This approach ensures that every test and deployment stage uses the correct data environment, minimizing risk of loosing data and mirroring production as closely as possible for validation.
 
 ## 📜 License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
