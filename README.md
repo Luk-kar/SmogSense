@@ -62,7 +62,6 @@ Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker
 **Key Services:**  
 Dagster, Superset, pgAdmin, MinIO, MLflow, JupyterLab
 
----
 ## ☁️ Cloud Deployment
 For cloud deployments, provisioning uses:
 - <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [**Terraform**](https://www.terraform.io/)  

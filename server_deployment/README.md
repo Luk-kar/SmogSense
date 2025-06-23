@@ -1,80 +1,71 @@
 # SmogSense Deployment and Management Guide
 
-This guide provides a concise overview for setting up, deploying, and managing the SmogSense project using [Terraform](https://developer.hashicorp.com/terraform) and [Ansible](https://docs.ansible.com/). It is designed to streamline infrastructure provisioning and application deployment.
+## Overview
+Automate cloud infrastructure provisioning and application deployment for SmogSense using:
+- <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/terraform/terraform-original.svg" alt="Terraform" width="20"/> [**Terraform**](https://developer.hashicorp.com/terraform): Infrastructure provisioning
+- <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/ansible/ansible-original.svg" alt="Ansible" width="20"/> [**Ansible**](https://docs.ansible.com/): Configuration management
 
-- **Terraform** provisions the underlying cloud infrastructure, creating the servers and network resources required for SmogSense.
-- **Ansible** connects to these servers to configure them, install necessary software, and deploy the application, ensuring a fully automated and reproducible deployment pipeline.
+**Access deployed dashboard:**  
+`<public_ip>:8090`
 
-The public access for the dashboard is:
+## ⚙️ Environment Configuration
+### Prerequisites
+1. Clone repository:
+   ```
+   cd server_deployment
+   ```
+2. Configure environment variables:
+   ```
+   set -a
+   source .env
+   set +a
+   ```
+
+### Environment Variables
 ```
-<public_ip>:8090
-```
-## Environment Setup
-
-Load environment variables for deployment:
-
-```sh
-cd server_deployment
-set -a
-source .env
-set +a
-```
-
-Ensure all required variables are set in `.env` (see `.env.example` for reference):
-
-```sh
 # Terraform Configuration
-TF_VAR_subscription_id=your-subscription-id-here
-TF_VAR_resource_group=your-resource-group-name-here
-TF_VAR_location="Your Azure Region Here" # e.g., "Switzerland North"
-TF_VAR_admin_username="your-admin-username-here"
-TF_VAR_admin_password="your-secure-password-here"
+TF_VAR_subscription_id="your-subscription-id"
+TF_VAR_resource_group="your-resource-group"
+TF_VAR_location="Your Azure Region"  # e.g., "Switzerland North"
+TF_VAR_admin_username="admin-user"
+TF_VAR_admin_password="secure-password"
 
 # Ansible Configuration
-ANSIBLE_HOST=000.000.00.000
-ANSIBLE_SSH_PRIVATE_KEY_FILE="/some_path/.ssh/vm_private_key.pem"
+ANSIBLE_HOST="000.000.00.000"
+ANSIBLE_SSH_PRIVATE_KEY_FILE="/path/to/vm_private_key.pem"
 ANSIBLE_PYTHON_INTERPRETER="/usr/bin/python3"
 ```
+
 ---
 
-## Terraform Commands
-
-Terraform automates cloud infrastructure provisioning.
-
-**Initialize Terraform:**
-```sh
-cd terraform/azure  # or terraform/aws  or /gcp or /any_other_cloud_service, depending on your target
+## 🏗️ Terraform Workflow
+### Initialize Terraform
+```
+cd terraform/azure # or other
 terraform init
 ```
 
-**Validate configuration:**
-```sh
+### Validate Configuration
+```
 terraform validate
 ```
 
-**Apply infrastructure changes:**
-```sh
+### Apply Infrastructure Changes
+```
 terraform apply
 ```
 
-**Destroy specific resources (e.g., only VMs and keys):**
-```sh
+### Destroy Specific Resources
+```
 terraform destroy \
   -target=azurerm_linux_virtual_machine.ubuntu_vm \
   -target=tls_private_key.ubuntu_vm_key
 ```
+
 ---
 
-## Ansible Automation
-
-Ansible manages server configuration and application deployment.
-
-**Inventory and Variables**
-
-- **Hosts and credentials:** Managed via `ansible/inventory.yaml` and group variables in `ansible/group_vars/ubuntu.yml`.
-- **Environment variables:** Loaded from `server_deployment/.env`.
-
-**Example inventory.yaml:**
+## ⚙️ Ansible Automation
+### Inventory Configuration (`ansible/inventory.yaml`)
 ```yaml
 all:
   children:
@@ -87,47 +78,38 @@ all:
           ansible_ssh_private_key_file: "{{ lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY_FILE') }}"
 ```
 
-**Example group_vars/ubuntu.yml:**
+### Group Variables (`ansible/group_vars/ubuntu.yml`)
 ```yaml
 smogsense_repo: "https://github.com/Luk-kar/SmogSense"
 repository_dir: "/home/{{ ansible_user }}"
 smogsense_dir: "{{ repository_dir }}/SmogSense"
 ```
 
-### Ansible Workflow
-
-**1. Load environment variables:**
-```sh
-cd server_deployment
-set -a
-source .env
-set +a
-```
-
-**2. Run full setup (recommended for first-time deployment):**
+### Playbook Execution
+**Full deployment (first-time setup):**
 ```sh
 ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml"
 ```
 This playbook executes all roles: `common`, `docker`, `xrdp`, `app`, `config`, and `deploy`.
 
-**3. Run specific roles using tags:**
+**Target specific components:**
 ```sh
 ansible-playbook -i "./ansible/inventory.yaml" "./ansible/full_setup.yml" --tags docker,deploy
 ```
 Common tags: `common`, `docker`, `xrdp`, `app`, `config`, `deploy`.
 
-**4. Upload example data to Superset BI tool:**
+**Upload example data to Superset:**
 ```sh
 ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.yml" --tags upload_data
 ```
 *This playbook is designed to upload sample datasets and dashboards to the Superset BI tool. However, due to database password restrictions or missing permissions, the automatic upload may fail. In such cases, it is recommended to upload dashboards manually through the Superset user interface.*
 
-**5. Stop all services:**
+**Stop services:**
 ```sh
 ansible-playbook -i "./ansible/inventory.yaml" "./ansible/services_stop.yml"
 ```
 
-**6. Start from a specific task:**
+**Resume from task:**
 ```sh
 ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.yml" \
   --start-at-task "Upload dashboard_social_media.zip to Superset BI tool"
@@ -135,30 +117,32 @@ ansible-playbook -i "./ansible/inventory.yaml" "./ansible/upload_example_data.ym
 
 ---
 
-## Role Overview
+## 🔧 Role Reference
+| Role | Purpose |
+|------|---------|
+| `common` | Install system dependencies and updates |
+| `docker` | Install Docker and Docker Compose |
+| `xrdp` | Configure remote desktop access |
+| `app` | Clone repository and prepare scripts |
+| `config` | Manage environment/config files |
+| `deploy` | Build images and start services |
+| `browser` | Install Chromium and set as default |
 
-- **common:** Installs system dependencies and updates packages.
-- **docker:** Installs Docker and Docker Compose, configures user groups, and starts Docker.
-- **xrdp:** Installs XFCE and XRDP for remote desktop access.
-- **app:** Clones the SmogSense repository and prepares application scripts.
-- **config:** Copies environment and configuration files.
-- **deploy:** Runs tests, builds Docker images, and starts services via Docker Compose.
-- **browser:** Updates the package index, installs the Chromium browser, and sets Chromium as the default browser for all users.
-
----
-
-## SSH and File Transfer
-
-**SSH to your VM:**
-```sh
-ssh -i /path_to/cloud_provider/vm_private_key.pem user@192.0.2.0
+## 🔐 SSH Management
+**Connect to VM:**
+```
+ssh -i /path_to/vm_private_key.pem user@192.0.2.0
 ```
 
-**Copy files to your VM:**
-```sh
-scp /path_to/file username@192.0.2.0:/path/to/destination
+**Transfer files:**
 ```
-
+scp /local/file user@192.0.2.0:/remote/path
+```
+**Host key management:**
+```
+ssh-keygen -R 192.0.2.1  # Remove old key
+ssh adminuser@192.0.2.2   # Add new fingerprint
+```
 ---
 
 ## Resource Monitoring
@@ -185,26 +169,10 @@ top -bn2 | grep '%Cpu' | tail -1 | awk '{used=100-$8; printf("CPU Used: %.2f%% /
 CPU Used: 23.45% / 100% (Available: 76.55%)
 
 ```
----
 
-## Remote Desktop Access
+## 🖥️ Remote Access
+Use [Remmina](https://remmina.org/) or similar tools for graphical remote desktop access.
 
-For graphical remote desktop, use [Remmina](https://remmina.org/) or any other dedicated tool.
 
-## Adding SSH Host Key Fingerprint
-
-When recreating virtual machines with new IP addresses, always remove old SSH host keys using `ssh-keygen -R`. This practice:
-- Prevents "host key changed" warnings that could mask genuine security threats
-- Mitigates risks from IP address reuse in cloud environments (common with ephemeral instances)
-- Maintains a clean `known_hosts` file by eliminating obsolete entries
-
-**Remove old key:**
-```sh
-ssh-keygen -R 192.0.2.1
-```
-
-**Add new key fingerprint:**
-```sh
-ssh adminuser@192.0.2.2
-# When prompted, accept the fingerprint with 'yes'
-```
+> **Security Best Practice:**  
+> Always remove old SSH host keys when recreating VMs to prevent "host key changed" warnings and mitigate IP reuse risks.
