@@ -15,7 +15,7 @@ The project, as an example, used [public air-quality data](https://github.com/Lu
 Dagster, Superset, pgAdmin, MinIO, MLflow, JupyterLab, Grafana
 
 ## 🛠️ Service Deployment
-Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`Docker`](https://www.docker.com/):
+Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [Docker](https://www.docker.com/):
 
 
 **Analytics:**
@@ -156,7 +156,7 @@ See [README](src/orchestration/dagster/README)
 
 **Security Notes:**  
 - ⚠️ Avoid storing secrets in .env for production - use dedicated secrets management
-- Security tags in [.env](.env):
+- Security tags in [.env.example](.env.example):
   - `#SECRETS`: Passwords/API keys requiring secure handling
   - `#WARNING`: Critical configuration needing attention
 
