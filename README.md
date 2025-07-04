@@ -1,11 +1,16 @@
 # 🌫️🔧 SmogSense
 
-A modular `data platform` for `end-to-end analytics`, `data pipeline orchestration`, `machine learning model registry`, and observability in local open-source environments.
+A modular `data platform` for `end-to-end analytics`, `data pipeline orchestration`, `machine learning model registry` in local open-source environments or for commercial cloud setup.
 
-**Cloud Deployment Example:**  
-See [*./server_deployment/README*](./server_deployment/README) for commercial cloud setup.
+## 📸 System Overview
+**Data Platform Architecture:**  
+<img src="doc/images/usage/system_collage.png" alt="System architecture collage" />
 
----
+**Resource Monitoring:**  
+<img src="doc/images/usage/monitoring/Grafana_Monitoring.png" alt="Grafana monitoring dashboard" />
+
+**Key Services:**  
+Dagster, Superset, pgAdmin, MinIO, MLflow, JupyterLab, Grafana
 
 ## 🛠️ Service Deployment
 Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`Docker`](https://www.docker.com/):
@@ -50,18 +55,6 @@ Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker
 **💬 (Optional) Team Collaboration:**
 - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost logo" width="20"/> [Mattermost:](https://mattermost.com/)<br>*Team chat and collaboration platform.*<br>[*`http://localhost:8065`*](http://localhost:8065)
 
----
-
-## 📸 System Overview
-**Data Platform Architecture:**  
-<img src="doc/images/usage/system_collage.png" alt="System architecture collage" />
-
-**Resource Monitoring:**  
-<img src="doc/images/usage/monitoring/Grafana_Monitoring.png" alt="Grafana monitoring dashboard" />
-
-**Key Services:**  
-Dagster, Superset, pgAdmin, MinIO, MLflow, JupyterLab
-
 ## ☁️ Cloud Deployment
 For cloud deployments, provisioning uses:
 - <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [**Terraform**](https://www.terraform.io/)  
@@ -70,12 +63,6 @@ For cloud deployments, provisioning uses:
   Configuration management automation
 - <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [**Azure**](https://azure.microsoft.com/)  
   Cloud provider
-
-**Scalability:**  
-While designed for single-machine Proof of Concept, services can be distributed using:
-- <img src="doc/images/logo/docker_swarm_logo.png" alt="Docker Swarm logo" width="20"/> `Docker Swarm`
-- <img src="doc/images/logo/kubernetes_logo.png" alt="Kubernetes logo" width="20"/> `Kubernetes`
-
 
 ## 📦 Requirements
 **For Services Deployment:**
@@ -108,19 +95,6 @@ While designed for single-machine Proof of Concept, services can be distributed 
       ```bash
       docker-compose up --build -d
       ```
-
-      **Initialized Services:**
-      - <img src="doc/images/logo/postgres_logo.png" alt="PostgreSQL" width="20"/> PostgreSQL databases
-      - <img src="doc/images/logo/postgres_logo.png" alt="pgAdmin" width="20"/> pgAdmin management
-      - <img src="doc/images/logo/MINIO_logo.png" alt="MinIO" width="20"/> MinIO object storage
-      - <img src="doc/images/logo/superset_logo.png" alt="Superset" width="20"/> Superset visualization
-      - <img src="doc/images/logo/jupyterlab_logo.png" alt="JupyterLab" width="20"/> JupyterLab notebooks
-      - <img src="doc/images/logo/mlflow_logo.svg" alt="MLflow" width="20"/> MLflow model tracking
-      - <img src="doc/images/logo/redis_logo.png" alt="Redis" width="20"/> Redis caching
-      - <img src="doc/images/logo/dagster_logo.png" alt="Dagster" width="20"/> Dagster orchestration
-      - Monitoring stack (Grafana, Prometheus, Loki, etc.)
-      - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost" width="20"/> Mattermost collaboration
-
       ---
 
    4. **Verify everything is running**  
@@ -170,7 +144,7 @@ Social media data (rate-limited)
 
 Assets include automated [Dagster checks](https://dagster.io/blog/dagster-asset-checks) for validation.  
 
-**Example validation logic:**  
+Example validation logic: 
 [air_quality/assets/annual_statistics/validations](src/orchestration/dagster/my_project/air_quality/assets/annual_statistics/validations)
 
 ### 🏗️ Dagster services setup
@@ -181,7 +155,7 @@ See [**README**](src/orchestration/dagster/README)
 
 **Security Notes:**  
 - ⚠️ **Avoid storing secrets in .env for production** - use dedicated secrets management
-- **Security tags in .env:**
+- **Security tags in [.env](.env):**
   - `#SECRETS`: Passwords/API keys requiring secure handling
   - `#WARNING`: Critical configuration needing attention
 
