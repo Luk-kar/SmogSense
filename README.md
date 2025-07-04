@@ -67,15 +67,15 @@ For cloud deployments, provisioning uses:
 
 ## 📦 Requirements
 For Services Deployment:
-- <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [`docker-compose.yml`](docker-compose.yml)
+- <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [docker-compose.yml](docker-compose.yml)
 
 For Cloud Deployment:
-- <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [`Terraform`](https://www.terraform.io/)
-- <img src="doc/images/logo/ansible_logo.svg" alt="ansible logo" width="20"/> [`Ansible`](https://www.ansible.com/)
-- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [`Azure`](https://azure.microsoft.com/) (or alternative provider)
+- <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [Terraform](https://www.terraform.io/)
+- <img src="doc/images/logo/ansible_logo.svg" alt="ansible logo" width="20"/> [Ansible](https://www.ansible.com/)
+- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [Azure](https://azure.microsoft.com/) (or alternative provider)
 
 Tested Environment: 
-<img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> [`Ubuntu`](https://ubuntu.com/) <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> [`Linux`](https://www.youtube.com/watch?v=rrB13utjYV4)
+<img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> [Ubuntu](https://ubuntu.com/) <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> [Linux](https://www.youtube.com/watch?v=rrB13utjYV4)
 
 ## ⚙️🔨 Installation and Usage
 
@@ -106,12 +106,12 @@ Tested Environment:
       ```
 
    5. Access the application
-      Open <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="20"/> `Dagster` at:  
+      Open <img src="doc/images/logo/dagster_logo.png" alt="PostgreSQL logo" width="20"/> Dagster at:  
       http://localhost:5000
 
        Run example tasks:
-       - `upload_example_project_data_to_minio`
-       - `restore_example_project_database`
+       - upload_example_project_data_to_minio
+       - restore_example_project_database
    6. Troubleshooting<br>
    Check asset logs for service issues
   
