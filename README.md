@@ -2,6 +2,8 @@
 
 A modular `data platform` for `end-to-end analytics`, `data pipeline orchestration`, `machine learning model registry` in local open-source environments or for commercial cloud setup.
 
+The project, as an example, used public air-quality data.
+
 ## 📸 System Overview
 **Data Platform Architecture:**  
 <img src="doc/images/usage/system_collage.png" alt="System architecture collage" />
