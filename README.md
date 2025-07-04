@@ -21,7 +21,6 @@ Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker
 **📊 Analytics:**
 - <img src="doc/images/logo/postgres_logo.png" alt="pgAdmin logo" width="20"/> [pgAdmin:](https://www.pgadmin.org)<br>*PostgreSQL database web management tool.*<br>[*`http://localhost:5050`*](http://localhost:5050)
 - <img src="doc/images/logo/superset_logo.png" alt="Superset logo" width="20"/> [Superset:](https://superset.apache.org)<br>*Data visualization and dashboarding platform.*<br>[*`http://localhost:8090`*](http://localhost:8090)
-*
 
 **🧪 Data Science:**
 - <img src="doc/images/logo/jupyterlab_logo.png" alt="JupyterLab logo" width="20"/> [JupyterLab:](https://jupyter.org)<br>*Interactive data analysis notebooks.*<br>[*`http://localhost:8888`*](http://localhost:8888)
