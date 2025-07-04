@@ -150,7 +150,7 @@ Example validation logic:
 
 ### 🏗️ Dagster services setup
 
-See [**README**](src/orchestration/dagster/README)
+See [README](src/orchestration/dagster/README)
 
 ## 🔧 Configuration
 
