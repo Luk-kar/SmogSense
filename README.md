@@ -127,8 +127,6 @@ Health and demographic statistics
 Geospatial province data
 - [Twitter (X) API](https://twikit.readthedocs.io/en/latest/twikit.html)  
 Social media data (rate-limited)
-  
-**🔄 Pipeline Architecture:**
 
 ![data flow](./doc/images/dagster_pipelines/data_flow.png)
 
