@@ -56,15 +56,6 @@ Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker
 **(Optional) Team Collaboration:**
 - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost logo" width="20"/> [Mattermost:](https://mattermost.com/)<br>*Team chat and collaboration platform.*<br>[*`http://localhost:8065`*](http://localhost:8065)
 
-## ☁️ Cloud Deployment
-For cloud deployments, provisioning uses:
-- <img src="doc/images/logo/terraform_logo.png" alt="terraform logo" width="20"/> [Terraform](https://www.terraform.io/)  
-  Infrastructure as code
-- <img src="doc/images/logo/ansible_logo.svg" alt="ansible logo" width="20"/> [Ansible](https://www.ansible.com/)  
-  Configuration management automation
-- <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [Azure](https://azure.microsoft.com/)  
-  Cloud provider
-
 ## 📦 Requirements
 For Services Deployment:
 - <img src="doc/images/logo/docker_logo.png" alt="Docker logo" width="20"/> [docker-compose.yml](docker-compose.yml)
@@ -127,7 +118,7 @@ Tested Environment:
 See [server_deployment/README.md](server_deployment/README.md)
 
 ## <img src="doc/images/logo/dagster_logo.png" alt="Dagster" width="25"/> Data Pipeline
-### 🌐 Data Sources
+**🌐 Data Sources:**
 - [GIOS API](https://powietrze.gios.gov.pl/pjp/content/api)  
 Air quality data (stations, measurements, AQI)
 - [Statistical API (GUS BDL)](https://bdl.stat.gov.pl/bdl/start)  
@@ -137,26 +128,26 @@ Geospatial province data
 - [Twitter (X) API](https://twikit.readthedocs.io/en/latest/twikit.html)  
 Social media data (rate-limited)
   
-### 🔄 Pipeline Architecture
+**🔄 Pipeline Architecture:**
 
 ![data flow](./doc/images/dagster_pipelines/data_flow.png)
 
-### ✅ Data Quality
+**✅ Data Quality:**
 
 Assets include automated [Dagster checks](https://dagster.io/blog/dagster-asset-checks) for validation.  
 
 Example validation logic: 
 [air_quality/assets/annual_statistics/validations](src/orchestration/dagster/my_project/air_quality/assets/annual_statistics/validations)
 
-### 🏗️ Dagster services setup
+**🏗️ Dagster services setup:**
 
 See [README](src/orchestration/dagster/README)
 
 ## 🔧 Configuration
 
-**Security Notes:**  
+- Look at [.env.example](.env.example).
 - ⚠️ Avoid storing secrets in .env for production - use dedicated secrets management
-- Security tags in [.env.example](.env.example):
+- Security tags:
   - `#SECRETS`: Passwords/API keys requiring secure handling
   - `#WARNING`: Critical configuration needing attention
 
