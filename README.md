@@ -174,7 +174,7 @@ tests/run_tests_all.sh
 
 ## 🧩 Further Possible Development
 ### Jenkins Integration
-Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins" width="15"/> [Jenkins](https://www.jenkins.io/) for CI/CD automation.
+Integrate <img src="doc/images/logo/jenkins_logo.png" alt="Jenkins" width="15"/> [Jenkins](https://www.jenkins.io/) for [CI/CD automation](https://github.com/resources/articles/devops/ci-cd).
 
 **Workflow:**
 1. Code Commit: Changes pushed to repo
