@@ -126,7 +126,7 @@ Health and demographic statistics
 - [Custom JSON Endpoint](https://gist.githubusercontent.com/Luk-kar/3aefd3f77d288ada85b5f44422b711d8/raw/b0793391ab0478e0d92052d204e7af493a7ecc92/poland_woj.json)  
 Geospatial province data
 - [Twitter (X) API](https://twikit.readthedocs.io/en/latest/twikit.html)  
-Social media data (rate-limited)
+Social media data
 
 ![data flow](./doc/images/dagster_pipelines/data_flow.png)
 
