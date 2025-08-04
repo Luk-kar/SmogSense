@@ -66,7 +66,7 @@ For Cloud Deployment:
 - <img src="doc/images/logo/azure_logo.svg" alt="Azure logo" width="20"/> [Azure](https://azure.microsoft.com/): *Cloud Service Platform*
 
 Tested Operating System: 
-<img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> [Ubuntu](https://ubuntu.com/) <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> [Linux](https://www.youtube.com/watch?v=rrB13utjYV4)
+<img src="doc/images/logo/ubuntu_logo.svg" alt="Ubuntu logo" width="20"/> [Ubuntu](https://www.releases.ubuntu.com/releases/22.04.5/) 22.04.5 LTS <img src="doc/images/logo/linux_logo.svg" alt="Linux logo" width="20"/> [Linux](https://www.youtube.com/watch?v=rrB13utjYV4)
 
 ## ⚙️🔨 Installation and Usage
 
