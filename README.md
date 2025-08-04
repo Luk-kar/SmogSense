@@ -110,9 +110,9 @@ Tested Environment:
       ```bash
       docker compose stop
       ```
-   8. Remove all services from the machine
+   8. Remove all services from the machine and their resources
       ```bash
-      docker compose down
+      docker compose down -v
       ```
 ### ☁️ Cloud Deployment
 See [server_deployment/README.md](server_deployment/README.md)
