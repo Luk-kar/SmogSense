@@ -73,7 +73,7 @@ Tested Environment:
 ### For local use
    1. Clone the repository
        ```bash
-       git clone hhttps://github.com/Luk-kar/SmogSense.git
+       git clone https://github.com/Luk-kar/SmogSense.git
        cd SmogSense
        ```
 
