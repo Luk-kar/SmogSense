@@ -31,7 +31,7 @@
   💀 **Causes of Death**: Categorized mortality data  
   👥 **Population Metrics**: Regional demographic statistics  
 - **[Social Media (Twitter/X API):](https://developer.x.com/en/docs/x-api)**  
-  💬 Public sentiment and event-related data  
+  💬 Public sentiment data  
 - **[Administrative/Geospatial Data:](https://www.gugik.gov.pl/pzgik)**  
   🏞️ Regional boundaries and administrative hierarchies  
 
