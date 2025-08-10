@@ -85,8 +85,7 @@ GITHUB_POSTGRES_FILE_NAME=postgres.yaml
 MLFLOW_TRACKING_URI=http://mlflow:5000
 ```
 ### 🔀 Dynamic Dagster Configuration Files
-
-- **Jinja2 templates** generate Dagster configs from environment variables
+Jinja2 templates generate Dagster configs from environment variables
 - **Generator Scripts**: 
   - [`dagster_generator.py`](./dagster_generator.py)
   - [`workspace_generator.py`](./workspace_generator.py) 
