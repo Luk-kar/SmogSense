@@ -109,6 +109,8 @@ The pipeline includes comprehensive data validation:
 - **Duplicate Detection**: Identifies and handles duplicate records
 - **Foreign Key Mapping**: Maintains relationships between entities
 
+## 🚀 Deployment
+
 ### 🔄 Pipelines Services  
 Dagster orchestrates domain pipelines via dedicated isolated [gRPC servers](https://docs.dagster.io/deployment/code-locations/workspace-yaml#running-your-own-grpc-server):
 
@@ -125,19 +127,12 @@ Dagster orchestrates domain pipelines via dedicated isolated [gRPC servers](http
 - **Dagster Webserver** (Port `5000`): Pipeline visualization and control
 - **Dagster Daemon**: Task and jobs scheduler
 
-## 🚀 Deployment
-
-### 🐳 Docker Setup
-
-The project uses Docker for deployment with separate containers for:
-
-- **Dagster Webserver**: Monitoring interface
-- **Dagster Daemon**: Background processing
+### 🗄️ Data Storage
 - **PostgreSQL**: Primary datastore
 - **MinIO**: Object storage for data lake
 
 ## 📊 Monitoring & Operations
-
+Dagster provides:
 - **Real-time Visualization**: Dagster UI for execution tracking
 - **Asset Materialization**: Data state monitoring
 - **Validation Reporting**: Automated quality alerts
@@ -163,8 +158,8 @@ The project uses Docker for deployment with separate containers for:
 **➕ Adding New Data Sources:**
 1. Create module in `src/orchestration/dagster/my_project/` (e.g., `weather`)
 2. Implement acquisition in `src/data_acquisition/`
-3. Add transformation/validation logic
-4. Define database models (if new entities)
+3. Add transformation/validation logic, look at existing modules as inspiration
+4. Define database models for database
 5. Implement asset checks
 
 **🧩 Dagster Component Relationships**:
