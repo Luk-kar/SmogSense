@@ -12,7 +12,7 @@
 - **Automated Orchestration**: Uses `Dagster` for dependency-aware pipeline management
 - **Data Lake Implementation**: Leverages `MinIO` for versioned intermediate storage
 - **Structured Storage**: `PostgreSQL` database with normalized schemas
-- **Analytical Optimization**: Database views for pre-calculated visualization metrics
+- **Analytical Optimization**: Ready database views for visualization metrics
 - **Validation Framework**: Comprehensive data quality checks at all stages
 - **Containerized Deployment**: Docker-based isolated environments per pipeline component
 
