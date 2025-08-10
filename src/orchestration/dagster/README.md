@@ -84,7 +84,7 @@ GITHUB_POSTGRES_FILE_NAME=postgres.yaml
 # MLflow Configuration
 MLFLOW_TRACKING_URI=http://mlflow:5000
 ```
-### 🔀 Dynamic Dagster Configuration
+### 🔀 Dynamic Dagster Configuration Files
 
 - **Jinja2 templates** generate Dagster configs from environment variables
 - **Generator Scripts**: 
