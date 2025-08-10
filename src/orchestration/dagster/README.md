@@ -125,14 +125,6 @@ Dagster orchestrates domain pipelines via dedicated isolated [gRPC servers](http
 - **Dagster Webserver** (Port `5000`): Pipeline visualization and control
 - **Dagster Daemon**: Task and jobs scheduler
 
-**Unified Architecture**:
-1. Isolated container environments
-2. Port-based gRPC communication
-3. Shared PostgreSQL/MinIO services
-4. Health-monitored connectivity
-
-The modular design allows independent updates to pipelines without disrupting others.
-
 ## 🚀 Deployment
 
 ### 🐳 Docker Setup
