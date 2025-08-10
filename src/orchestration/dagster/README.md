@@ -40,10 +40,10 @@
 
 #### 🔄 Processing Workflow
 1. **Data Acquisition**: API-based raw data collection
-2. **Processing & Validation**: Transformation with quality check
-3. **Data Lake**: Stores intermediate data in MinIO
+2. **Data Lake**: Stores intermediate data in MinIO
+3. **Processing & Validation**: Transformation with quality check
 4. **Database Upload**: Persists processed data to PostgreSQL
-5. **Data Unification**: Cross-source integration
+5. **Data Unification**: Cross-source integration in the database
 
 ## ⚙️ Configuration
 
