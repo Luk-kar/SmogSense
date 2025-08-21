@@ -51,7 +51,7 @@ Services are deployed via <img src="doc/images/logo/docker_logo.png" alt="Docker
 - <img src="doc/images/logo/mlflow_logo.svg" alt="MLflow logo" width="20"/> [MLflow:](https://mlflow.org/)<br>*Track and manage ML models.*<br>[*`http://localhost:5005`*](http://localhost:5005)
 
 **In-Memory, Key-Value, Database:**
-- <img src="doc/images/logo/redis_logo.png" alt=" Redis logo" width="20"/> [Redis:](https://redis.io/)<br>*Fast in-memory cache and queue.*<br>
+- <img src="doc/images/logo/redis_logo.png" alt=" Redis logo" width="20"/> [Redis:](https://redis.io/)<br>*Fast in-memory cache and queue used for Superset.*<br>
 
 **(Optional) Team Collaboration:**
 - <img src="doc/images/logo/mattermost_logo.png" alt="Mattermost logo" width="20"/> [Mattermost:](https://mattermost.com/)<br>*Team chat and collaboration platform.*<br>[*`http://localhost:8065`*](http://localhost:8065)
