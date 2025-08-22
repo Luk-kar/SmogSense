@@ -16,7 +16,7 @@
 #   <output_file>      Path to the file where concatenated content is written.
 #
 # Example:
-#   ./read_files_and_content.sh ./src collected.md
+#   ./read_files_and_content.sh "./src" "collected.md"
 #
 # Notes:
 #   - Overwrites <output_file> if it already exists.
